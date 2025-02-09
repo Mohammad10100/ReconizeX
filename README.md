@@ -16,7 +16,7 @@ $ cd ReconizerX
 $ chmod +x reconizerx.sh
 ```
 install apktool ([Read How](https://ibotpeaches.github.io/Apktool/install/))
-
+required: [python](https://www.python.org/downloads/)
 required: [nuclei](https://github.com/projectdiscovery/nuclei)
 
 you can use the already existing templates | create your own | or can use the originals from [optive](https://github.com/optiv/mobile-nuclei-templates)
@@ -152,3 +152,5 @@ python3 reconizerx.py <target.apk>
  
 
 # 📷 Screenshots
+![screenshot](https://github.com/user-attachments/assets/3a4903ec-61b6-479a-8da5-273220bfeeab)
+
