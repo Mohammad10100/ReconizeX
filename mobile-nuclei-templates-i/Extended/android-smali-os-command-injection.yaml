@@ -1,0 +1,31 @@
+id: android-smali-os-command-injection-strict
+info:
+  name: Android Smali OS Command Injection - Strict
+  author: mohammad
+  severity: critical
+  description: Detects OS command execution in Smali code that may lead to command injection vulnerabilities, focusing on cases where user input or dynamic data is used in command execution.
+  tags: android, security, smali, command-injection
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Match command execution methods (Runtime.exec or ProcessBuilder)
+      - type: regex
+        regex:
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(Ljava/lang/String;\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;-><init>\(.*?\)'
+        condition: or
+
+      # Match suspicious command strings (e.g., shell commands, binaries)
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*".*?(sh|/bin/sh|/system/bin/sh|/system/xbin/su|nc|wget|curl|chmod|chown|rm -rf).*?"'
+        condition: and
+
+      # Match cases where user input or dynamic data is concatenated with command strings
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'
+        condition: and

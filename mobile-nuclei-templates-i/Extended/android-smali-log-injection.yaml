@@ -1,0 +1,21 @@
+id: android-smali-log-injection
+info:
+  name: Android Smali Log Injection (Improper Output Neutralization)
+  author: mohammad
+  severity: medium
+  description: Detects improper logging of sensitive data or untrusted input in Smali code.
+  tags: android,security,smali,log-injection
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Landroid/util/Log;->[deiwv]\(Ljava/lang/String;Ljava/lang/String;\)I'
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*".*?(password|api_key|token|secret|auth|access_key).*?"'
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->format\(Ljava/lang/String;.*?\)'

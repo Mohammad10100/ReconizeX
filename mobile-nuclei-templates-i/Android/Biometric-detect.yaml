@@ -1,0 +1,25 @@
+id: biometric-detect
+
+info:
+  name: Biometric or Fingerprint Permission Detection
+  author: mohammad
+  severity: info
+  description: "Detects if an Android app requests biometric authentication permissions."
+  reference:
+    - https://developer.android.com/reference/android/hardware/biometrics/BiometricPrompt
+  remediation: "If biometric authentication is not needed, remove USE_FINGERPRINT and USE_BIOMETRIC permissions."
+
+file:
+  - extensions:
+      - xml 
+
+    matchers:
+      - type: word
+        words:
+          - "android.permission.USE_FINGERPRINT"
+          - "android.permission.USE_BIOMETRIC"
+          - 'FingerprintManager'
+          - 'biometric_authentication'
+          - 'useBiometricPrompt'
+        condition: or
+        case-insensitive: true

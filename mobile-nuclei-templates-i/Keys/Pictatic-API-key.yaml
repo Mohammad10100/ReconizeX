@@ -1,0 +1,23 @@
+id: pictatic-api-key
+
+info:
+  name: Pictatic API Key
+  author: mohammad
+  severity: high
+  description: "Detects exposed Pictatic API keys, which can give unauthorized access to Pictatic services, leading to potential security risks."
+  reference:
+    - https://www.pictatic.com/docs/api/authentication
+  remediation: "Ensure API keys are never hardcoded in source code. Use environment variables or secure vaults for storage. Rotate keys regularly."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "sk_live_[0-9a-z]{32}"

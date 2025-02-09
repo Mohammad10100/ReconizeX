@@ -1,0 +1,21 @@
+id: android-path-traversal
+info:
+  name: Android Path Traversal Vulnerability
+  author: mohammad
+  severity: high
+  description: Detects improper limitation of a pathname to a restricted directory, which may lead to path traversal attacks.
+  tags: android,security,path-traversal,file-access,smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".*?/(\.\./)+.*?"'
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/File;->getCanonicalPath\(\)Ljava/lang/String;'
+      - type: regex
+        regex:
+          - 'invoke-direct\s+\{.*?\},\s+Ljava/io/File;-><init>\(Ljava/lang/String;\)V'

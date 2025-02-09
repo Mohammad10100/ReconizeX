@@ -1,0 +1,23 @@
+id: mailgun-api-key
+
+info:
+  name: Mailgun API Key
+  author: mohammad
+  severity: high
+  description: "Detects exposed Mailgun API keys in the code, which can lead to unauthorized access to Mailgun services."
+  reference:
+    - https://documentation.mailgun.com/en/latest/quickstart.html#api-keys
+  remediation: "Do not hardcode API keys in the source code. Use environment variables or secret management tools for secure storage."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "key-[0-9a-zA-Z]{32}"

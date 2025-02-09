@@ -1,0 +1,23 @@
+id: linkedin-client-id
+
+info:
+  name: Linkedin Client ID
+  author: mohammad
+  severity: low
+  description: "Detects exposed LinkedIn Client IDs in the code, which can potentially be misused if unauthorized."
+  reference:
+    - https://developer.linkedin.com/docs/oauth2
+  remediation: "Avoid hardcoding LinkedIn Client IDs in the source code. Use environment variables or secret management solutions for secure storage."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "(?i)linkedin(.{0,20})?[0-9a-z]{12}"

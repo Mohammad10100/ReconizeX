@@ -1,0 +1,26 @@
+id: android-sql-injection
+info:
+  name: Android SQL Injection Detection
+  author: mohammad
+  severity: high
+  description: Detects improper neutralization of special elements in SQL commands, which can lead to SQL injection vulnerabilities.
+  tags: android,security,sql-injection,sqlite
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - 'Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;'
+          - 'Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;'
+      - type: regex
+        regex:
+          - '("[^"]*\s*(SELECT|INSERT|UPDATE|DELETE)\s+.*?\s*(FROM|INTO|SET)\s+.*?"\s*\+)'
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;.*?\)'
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;.*?\)'

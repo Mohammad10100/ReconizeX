@@ -1,0 +1,31 @@
+id: android-smali-command-execution-strict
+info:
+  name: Android Smali Command Execution Detection - Strict
+  author: mohammad
+  severity: critical
+  description: Detects command execution vulnerabilities in Smali code, including Runtime.exec() and ProcessBuilder usage, focusing on cases where user input or dynamic data is used in command execution.
+  tags: android, security, command-injection, smali, rce
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Match command execution methods (Runtime.exec or ProcessBuilder)
+      - type: regex
+        regex:
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(Ljava/lang/String;\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;-><init>\(.*?\)'
+        condition: or
+
+      # Match suspicious command strings (e.g., shell commands, binaries)
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*".*?(rm -rf|cat /proc/self/environ|wget|curl|chmod|chown|nc|sh|busybox).*?"'
+        condition: and
+
+      # Match cases where user input or dynamic data is manipulated
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->replaceAll\(Ljava/lang/String;Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'
+        condition: and

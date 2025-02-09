@@ -1,0 +1,31 @@
+id: slack-api
+
+info:
+  name: Slack API Key
+  author: mohammad
+  severity: high
+  description: |
+    Detects Slack API keys used to authenticate with Slack's API endpoints. These keys can provide unauthorized access to Slack workspaces, channels, messages, and other sensitive data.
+    If exposed, attackers can take control of Slack integrations and bots, access private messages, and potentially leak sensitive business information.
+  remediation: |
+    - Revoke and regenerate the API key immediately.
+    - Ensure API keys are stored securely using environment variables or secret management systems.
+    - Implement OAuth for more secure and scoped API access.
+    - Regularly audit and review API keys and integrations.
+    - Avoid hardcoding keys in source code and use proper access control mechanisms.
+  references:
+    - https://api.slack.com/docs/authentication
+    - https://api.slack.com/docs/token-types
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "xox[baprs]-([0-9a-zA-Z]{10,48})?"

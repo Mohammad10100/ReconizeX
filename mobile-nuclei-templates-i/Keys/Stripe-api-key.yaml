@@ -1,0 +1,29 @@
+id: stripe-api-key
+
+info:
+  name: Stripe API Key
+  author: mohammad
+  severity: high
+  description: |
+    Detects Stripe API keys used for authenticating requests to the Stripe platform. These keys are sensitive and should be kept private. If exposed, attackers can misuse them to charge customers, retrieve sensitive payment information, and perform other malicious actions on the Stripe account.
+  remediation: |
+    - Immediately revoke any exposed API keys in the Stripe Dashboard.
+    - Regenerate new API keys and update your application with the new keys.
+    - Avoid storing API keys directly in source code. Instead, use environment variables or a secure secrets management system.
+    - Monitor your Stripe account for any unauthorized transactions or activities.
+  references:
+    - https://stripe.com/docs/keys
+    - https://stripe.com/docs/security
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "(?i)stripe(.{0,20})?[sr]k_live_[0-9a-zA-Z]{24}"

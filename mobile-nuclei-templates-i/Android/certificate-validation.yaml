@@ -1,0 +1,20 @@
+id: improper-certificate-validation
+
+info:
+  name: Improper SSL/TLS Certificate Validation
+  author: mohammad
+  severity: medium
+  description: "Detects usage of SslErrorHandler.proceed(), which allows bypassing SSL/TLS certificate validation."
+  reference:
+    - https://developer.android.com/reference/android/webkit/SslErrorHandler#proceed()
+  remediation: "Implement proper certificate validation and avoid using `proceed()` without verifying SSL errors."
+
+file:
+  - extensions:
+      - smali    
+
+    matchers:
+      - type: word
+        words:
+          - "Landroid/webkit/SslErrorHandler;->proceed()V"
+        case-insensitive: true  

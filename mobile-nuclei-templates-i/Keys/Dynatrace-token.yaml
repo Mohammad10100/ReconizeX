@@ -1,0 +1,23 @@
+id: dynatrace-token
+
+info:
+  name: Dynatrace Token
+  author: mohammad
+  severity: high
+  description: "Detects hardcoded Dynatrace API tokens, which may expose sensitive monitoring and application data."
+  reference:
+    - https://www.dynatrace.com/support/help/manage/access-control/how-to-use-personal-access-tokens
+  remediation: "Remove hardcoded Dynatrace tokens and use environment variables or a secure secrets management system."
+
+file:
+  - extensions:
+      -- smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "dt0[a-zA-Z]{1}[0-9]{2}\\.[A-Z0-9]{24}\\.[A-Z0-9]{64}"

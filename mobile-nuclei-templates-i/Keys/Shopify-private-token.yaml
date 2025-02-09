@@ -1,0 +1,30 @@
+id: shopify-private-token
+
+info:
+  name: Shopify Private App Access Token
+  author: mohammad
+  severity: high
+  description: |
+    Detects Shopify Private App Access Tokens, which allow direct API access to a store.
+    If exposed, an attacker can potentially access or modify store data without authentication.
+  remediation: |
+    - Revoke any exposed tokens immediately from the Shopify admin panel.
+    - Avoid hardcoding tokens in source code; use environment variables or a secure vault instead.
+    - Limit API permissions to the minimum required for the app’s functionality.
+    - Regularly audit API access and rotate tokens periodically to reduce security risks.
+  references:
+    - https://shopify.dev/docs/api/usage/authentication
+    - https://help.shopify.com/en/manual/apps/private-apps
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "shppa_[a-fA-F0-9]{32}"

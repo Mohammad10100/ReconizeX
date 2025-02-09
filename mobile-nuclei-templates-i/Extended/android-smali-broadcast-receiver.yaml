@@ -1,0 +1,32 @@
+id: android-smali-broadcast-receiver-strict
+info:
+  name: Android Smali Broadcast Receiver - Strict Improper Intent Verification
+  author: mohammad
+  severity: high
+  description: Detects Broadcast Receivers that retrieve intent data without proper validation, which may lead to security risks such as Intent Spoofing.
+  tags: android, security, smali, intent, receiver
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Match intent data retrieval (action, extras, data)
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->(getAction|getExtras|getData|getParcelableExtra)\(.*?\).*?'
+        condition: and
+
+      # Ensure no validation is performed on the retrieved data
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->equals\(Ljava/lang/Object;\)Z'  # Check for equals() validation
+          - 'if-eqz\s+.*?,\s+.*?'  # Check for null or equality checks
+          - 'if-nez\s+.*?,\s+.*?'
+        negative: true  # Negate this condition (i.e., ensure these patterns are NOT present)
+
+      # Ensure the retrieved data is used in a sensitive context
+      - type: regex
+        regex:
+          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Context;->(startActivity|sendBroadcast|startService)\(.*?\).*?'  # Sensitive methods
+          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Intent;->(setClass|setComponent|setPackage)\(.*?\).*?'  # Intent manipulation
+        condition: or

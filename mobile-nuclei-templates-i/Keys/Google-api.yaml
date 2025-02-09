@@ -1,0 +1,19 @@
+id: google-api-key
+
+info:
+  name: Google API key
+  author: mohammad
+  severity: low
+  description: "Detects exposed Google API keys in the code, which could lead to unauthorized access if misused."
+  reference:
+    - https://cloud.google.com/docs/authentication/api-keys
+  remediation: "Ensure that API keys are not hardcoded in source code. Use environment variables or secret management tools to store them securely."
+
+file:
+  - extensions:
+      - xml
+
+    extractors:
+      - type: regex
+        regex:
+          - "AIza[0-9A-Za-z\\-_]{35}"

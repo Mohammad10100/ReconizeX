@@ -1,0 +1,15 @@
+id: android-insecure-random
+info:
+  name: Android Insecure Random Number Generation
+  author: mohammad
+  severity: medium
+  description: Detects the use of insecure random number generators, which may lead to predictable values.
+  tags: android, security, random, crypto
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      - type: regex
+        regex:
+          - 'new-instance\s+\S+,\s+Ljava/util/Random;'

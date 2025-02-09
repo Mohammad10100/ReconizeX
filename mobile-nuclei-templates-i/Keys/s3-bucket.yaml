@@ -1,0 +1,35 @@
+id: s3-bucket
+
+info:
+  name: S3 Bucket Detect
+  author: mohammad
+  severity: info
+  description: |
+    Detects potential references to Amazon S3 buckets in the source code.
+    Publicly exposed S3 buckets may lead to data leaks, unauthorized access, and security risks.
+  remediation: |
+    - Ensure that S3 buckets are private unless explicitly required to be public.
+    - Use AWS IAM policies to control access to the bucket and restrict permissions.
+    - Enable logging and monitoring to detect unauthorized access.
+    - Regularly audit S3 bucket permissions and use encryption for stored data.
+    - Avoid hardcoding S3 bucket URLs in source code. Instead, use environment variables or configuration files.
+  references:
+    - https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html
+    - https://aws.amazon.com/security/security-bulletins/s3-bucket-permissions-update/
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "[a-z0-9.-]+\\.s3\\.amazonaws\\.com"
+          - "[a-z0-9.-]+\\.s3-[a-z0-9-]\\.amazonaws\\.com"
+          - "[a-z0-9.-]+\\.s3-website[.-](eu|ap|us|ca|sa|cn)"
+          - "//s3\\.amazonaws\\.com/[a-z0-9._-]+"
+          - "//s3-[a-z0-9-]+\\.amazonaws\\.com/[a-z0-9._-]+"

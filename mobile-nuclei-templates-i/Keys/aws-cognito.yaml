@@ -1,0 +1,27 @@
+id: aws-cognito-pool
+
+info:
+  name: AWS Cognito Pool ID Exposure
+  author: mohammad
+  severity: medium
+  description: |
+    Detects exposed AWS Cognito Pool IDs in decompiled APKs. 
+    Publicly exposed Cognito Pool IDs can lead to unauthorized access to AWS resources.
+  reference:
+    - https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html
+  remediation: |
+    - Avoid hardcoding AWS Cognito Pool IDs in application files.
+    - Store credentials in a secure vault or environment variables.
+    - Restrict unauthenticated access in AWS Cognito settings.
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+    extractors:
+      - type: regex
+        regex:
+          - "[a-z]{2}-[a-z]+-\\d:[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}"

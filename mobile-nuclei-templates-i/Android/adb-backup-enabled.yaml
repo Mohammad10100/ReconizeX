@@ -1,0 +1,18 @@
+id: adb-backup-enabled
+
+info:
+  name: ADB Backup Enabled
+  author: mohammad
+  severity: lowwwer
+  description: "Detects if android:allowBackup is set to true in AndroidManifest.xml."
+  reference:
+    - https://developer.android.com/guide/topics/data/autobackup
+  remediation: "Set android:allowBackup to 'false' in AndroidManifest.xml to prevent unauthorized backups."
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - "<application\\b[^>]*\\bandroid:allowBackup\\s*=\\s*[\"']true[\"']"

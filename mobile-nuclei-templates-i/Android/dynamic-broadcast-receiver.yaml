@@ -1,0 +1,31 @@
+id: dynamic-registered-broadcast-receiver
+
+info:
+  name: Dynamic Registered Broadcast Receiver
+  author: mohammad
+  severity: medium
+  description: |
+    Detects the use of dynamically registered broadcast receivers in Android apps. 
+    Dynamically registered receivers can be registered at runtime, potentially exposing the app to risks such as unauthorized access or privilege escalation.
+  reference:
+    - https://developer.android.com/reference/android/content/BroadcastReceiver
+  remediation: |
+    It's recommended to statically register critical broadcast receivers in the AndroidManifest.xml instead of dynamically at runtime.
+    If dynamic registration is necessary, ensure the receiver is properly secured and validate incoming intents to mitigate the risk of malicious broadcasts.
+
+file:
+  - extensions:
+      - smali
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - ";->registerReceiver\\(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;\\)"
+      - type: word
+        words:
+          - "registerReceiver"
+        case-insensitive: true
+      - type: word
+        words:
+          - "<receiver"
+        case-insensitive: true

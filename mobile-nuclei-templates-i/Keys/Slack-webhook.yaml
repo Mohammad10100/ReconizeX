@@ -1,0 +1,30 @@
+id: slack-webhook
+
+info:
+  name: Slack Webhook
+  author: mohammad
+  severity: high
+  description: |
+    Detects Slack Webhook URLs used to send messages to Slack channels. These URLs are sensitive as they allow anyone with access to them to post messages into the Slack workspace, potentially leading to spam or malicious content.
+    Unauthorized access to these webhooks can result in spamming Slack channels, sending malicious payloads, or leaking sensitive information.
+  remediation: |
+    - Immediately regenerate the Slack webhook URL to invalidate the compromised one.
+    - Secure webhooks by restricting access to only trusted systems and users.
+    - Store webhooks securely in environment variables or secret management systems.
+    - Regularly audit the use of webhooks and ensure they are not exposed in public repositories or source code.
+  references:
+    - https://api.slack.com/messaging/webhooks
+    - https://api.slack.com/reference/messaging/webhooks
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "https://hooks.slack.com/services/T[0-9A-Za-z\\-_]{10}/B[0-9A-Za-z\\-_]{10}/[0-9A-Za-z\\-_]{23}"

@@ -1,0 +1,23 @@
+id: mailchimp-api-key
+
+info:
+  name: Mailchimp API Key
+  author: mohammad
+  severity: high
+  description: "Detects exposed Mailchimp API keys in the code, which can lead to unauthorized access and misuse of Mailchimp services."
+  reference:
+    - https://mailchimp.com/developer/marketing/guides/quick-start/
+  remediation: "Do not hardcode API keys in the source code. Use environment variables or secret management solutions to store them securely."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "[0-9a-f]{32}-us[0-9]{1,2}"

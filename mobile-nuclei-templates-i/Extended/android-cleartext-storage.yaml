@@ -1,0 +1,16 @@
+id: android-sharedprefs-cleartext
+info:
+  name: Android Cleartext Storage in SharedPreferences
+  author: mohammad
+  severity: high
+  description: Detects the usage of SharedPreferences storing sensitive information in cleartext.
+  tags: android,security,sharedprefs,cleartext
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/SharedPreferences\$Editor;->putString\(Ljava/lang/String;Ljava/lang/String;\)Landroid/content/SharedPreferences\$Editor;'

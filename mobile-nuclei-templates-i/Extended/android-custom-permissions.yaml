@@ -1,0 +1,15 @@
+id: android-custom-permissions
+info:
+  name: Android Custom Permissions
+  author: mohammad
+  severity: medium
+  description: Detects the use of custom permissions that may be overly permissive or misconfigured.
+  tags: android, security, permissions
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - '<permission\s+.*?android:protectionLevel=".*?".*?>'

@@ -1,0 +1,23 @@
+id: file-scheme
+
+info:
+  name: File Scheme Enabled
+  author: mohammad
+  severity: medium
+  description: |
+    Detects if the 'file' URI scheme is used in AndroidManifest.xml.
+    The 'file' URI scheme can expose the app to vulnerabilities, such as unauthorized file access.
+  reference:
+    - https://developer.android.com/reference/android/content/Intent#ACTION_VIEW
+  remediation: |
+    It is recommended to avoid using the 'file' URI scheme in Android applications to prevent potential file access vulnerabilities.
+    Use more secure URI schemes like 'content' or 'http(s)' where appropriate.
+
+file:
+  - extensions:
+      - xml
+
+    matchers:
+      - type: word
+        words:
+          - "android:scheme=\"file\""

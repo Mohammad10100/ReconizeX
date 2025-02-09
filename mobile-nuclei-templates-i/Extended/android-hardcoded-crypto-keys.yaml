@@ -1,0 +1,31 @@
+id: android-hardcoded-crypto-keys-strict
+info:
+  name: Android Hardcoded Cryptographic Keys Detection - Strict
+  author: mohammad
+  severity: high
+  description: Detects hardcoded cryptographic keys in Android applications using Smali analysis, focusing on high-confidence patterns.
+  tags: android, security, crypto, hardcoded-keys
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Match hardcoded cryptographic keys (e.g., base64 encoded strings)
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"[A-Za-z0-9+/=]{16,}"'  # Matches base64-like strings
+          - 'const-string\s+v\d+,\s*"[A-Fa-f0-9]{32,}"'    # Matches hex-encoded strings (e.g., AES keys)
+        condition: or
+
+      # Match cryptographic key usage (e.g., SecretKeySpec initialization)
+      - type: regex
+        regex:
+          - 'new-instance\s+\S+,\s+Ljavax/crypto/spec/SecretKeySpec;'
+          - 'invoke-direct\s+\{.*?\},\s+Ljavax/crypto/spec/SecretKeySpec;-><init>\(\[BLjava/lang/String;\)V'
+        condition: and
+
+      # Exclude common false positives (e.g., non-cryptographic strings)
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".*?(http|https|www|example|test|dummy).*?"'
+        negative: true  # Exclude these patterns

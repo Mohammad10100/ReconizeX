@@ -1,0 +1,30 @@
+id: sendgrid-api-key
+
+info:
+  name: Sendgrid API Key
+  author: mohammad
+  severity: high
+  description: |
+    Detects Sendgrid API keys, which are used for authenticating and sending emails via the Sendgrid service.
+    Exposure of this key can allow unauthorized email sending, potential spam, and account misuse.
+  remediation: |
+    - Revoke the exposed API key immediately and generate a new one from the Sendgrid dashboard.
+    - Update all applications using the key with the new, securely stored key.
+    - Avoid hardcoding API keys in source code. Use environment variables or a secure secrets management system.
+    - Regularly audit your codebase and repositories for exposed credentials.
+  references:
+    - https://sendgrid.com/docs/ui/account-and-settings/api-keys/
+    - https://docs.sendgrid.com/for-developers/sending-email/api-getting-started
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "SG\\.[a-zA-Z0-9]{22}\\.[a-zA-Z0-9]{43}"

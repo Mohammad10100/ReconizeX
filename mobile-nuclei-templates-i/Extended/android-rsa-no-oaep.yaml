@@ -1,0 +1,18 @@
+id: android-rsa-no-oaep
+info:
+  name: Android RSA Usage Without OAEP
+  author: mohammad
+  severity: high
+  description: Detects usage of RSA encryption without OAEP padding, which can lead to security vulnerabilities.
+  tags: android,security,rsa,cryptography,smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"RSA/ECB/PKCS1Padding"'
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'

@@ -1,0 +1,24 @@
+id: webview-universal-access
+
+info:
+  name: Webview Universal Access Enabled
+  author: mohammad
+  severity: medium
+  description: |
+    Detects if the `setAllowUniversalAccessFromFileURLs()` method is enabled in WebView settings, which can allow file URLs to access content from other origins, potentially exposing sensitive information or allowing cross-origin attacks.
+    This method, when enabled, allows JavaScript running in a WebView to access resources from file:// URLs, which may lead to security risks like unauthorized file access or exposure of sensitive data.
+  reference:
+    - https://developer.android.com/reference/android/webkit/WebSettings#setAllowUniversalAccessFromFileURLs(boolean)
+  remediation: |
+    Disable universal access from file URLs unless absolutely necessary. This can be done by calling `setAllowUniversalAccessFromFileURLs(false)` on the WebView’s settings object.
+    Limiting access to trusted sources and applying additional security measures, such as restricting access to local file systems, can also mitigate potential risks.
+    Ensure proper sanitization of any user inputs or untrusted content loaded in the WebView.
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - "Landroid/webkit/WebSettings;->setAllowUniversalAccessFromFileURLs\\(Z\\)V"

@@ -1,0 +1,27 @@
+id: aws-access-key
+
+info:
+  name: AWS Access Key ID Exposure
+  author: mohammad
+  severity: high
+  description: |
+    Detects hardcoded AWS Access Key IDs in decompiled APKs. 
+    Exposed credentials can lead to unauthorized access, data breaches, and AWS resource abuse.
+  reference:
+    - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+  remediation: |
+    - Revoke the exposed AWS Access Key immediately from the AWS IAM console.
+    - Rotate AWS keys and update them securely in a vault or environment variables.
+    - Implement IAM roles and temporary credentials instead of hardcoding secrets.
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+    extractors:
+      - type: regex
+        regex:
+          - "(A3T[A-Z0-9]|AKIA|AGPA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}"

@@ -1,0 +1,30 @@
+id: shopify-custom-token
+
+info:
+  name: Shopify Custom App Access Token
+  author: mohammad
+  severity: high
+  description: |
+    Detects Shopify Custom App Access Tokens, which can provide full API access to a Shopify store.
+    If exposed, an attacker may gain unauthorized access to sensitive store data, modify settings, or perform transactions.
+  remediation: |
+    - Revoke any exposed tokens immediately from the Shopify admin panel.
+    - Avoid hardcoding tokens in source code; use environment variables or secure vaults instead.
+    - Restrict API permissions to only what's necessary for the application.
+    - Regularly audit and rotate tokens to minimize exposure risks.
+  references:
+    - https://shopify.dev/docs/apps/auth/access-tokens
+    - https://help.shopify.com/en/manual/apps/private-apps
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "shpca_[a-fA-F0-9]{32}"

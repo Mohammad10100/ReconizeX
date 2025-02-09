@@ -1,0 +1,23 @@
+id: android-smali-unsafe-deserialization
+info:
+  name: Android Smali Unsafe Deserialization
+  author: mohammad
+  severity: high
+  description: Detects deserialization of untrusted data in Smali, which may lead to remote code execution (RCE).
+  tags: android,security,smali,deserialization,rce
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/ObjectInputStream;->readObject\(\)Ljava/lang/Object;'
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/Parcel;->readParcelable\(\)Landroid/os/Parcelable;'
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/Parcel;->readSerializable\(\)Ljava/io/Serializable;'
+        condition: or
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ldalvik/system/DexClassLoader;->loadClass\(Ljava/lang/String;\)Ljava/lang/Class;'

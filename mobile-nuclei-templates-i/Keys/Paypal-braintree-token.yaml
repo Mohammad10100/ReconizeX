@@ -1,0 +1,23 @@
+id: paypal-braintree-token
+
+info:
+  name: PayPal Braintree Access Token
+  author: mohammad
+  severity: high
+  description: "Detects exposed PayPal Braintree Access Tokens, which can lead to unauthorized access to payment processing systems."
+  reference:
+    - https://developer.paypal.com/braintree/docs/guides/credit-cards/overview
+  remediation: "Avoid hardcoding sensitive data like access tokens in the source code. Use environment variables or a secure vault for token storage."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "access_token\\$production\\$[0-9a-z]{16}\\$[0-9a-f]{32}"

@@ -1,0 +1,26 @@
+id: insecure-provider-path
+
+info:
+  name: Insecure Provider Path
+  author: mohammad
+  severity: medium
+  description: |
+    Detects insecure provider paths in Android apps that could expose sensitive data.
+    Specifically, it looks for content provider paths with insecure configurations, such as those that are set to root paths (i.e., `"path" = "."` or `""`), allowing unrestricted access.
+  reference:
+    - https://developer.android.com/reference/android/content/ContentProvider
+  remediation: |
+    Avoid using insecure provider paths that allow unrestricted access to sensitive data. 
+    Ensure that content provider paths are appropriately secured by limiting access and restricting permissions.
+    Consider using more restrictive path configurations and securing content provider permissions.
+
+file:
+  - extensions:
+      - smali
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - "root-path name=\"[0-9A-Za-z\\-_]{1,10}\" path=\"[.]\""
+          - "root-path name=\"[0-9A-Za-z\\-_]{1,10}\" path=\"\""
+          - "FileProvider.*path.*[\"']?\\.\\.?[\"']?"

@@ -1,0 +1,24 @@
+id: webview-addjavascript-interface
+
+info:
+  name: Webview addJavascript Interface Usage
+  author: mohammad
+  severity: medium
+  description: |
+    Detects the usage of WebView's `addJavascriptInterface` method, which can introduce security vulnerabilities.
+    This method allows JavaScript to access Android object methods, which could be exploited for malicious purposes, such as unauthorized access to sensitive data or features.
+  reference:
+    - https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)
+  remediation: |
+    Avoid using `addJavascriptInterface` with untrusted JavaScript content.
+    If necessary, restrict the interface to only trusted sources and limit the exposed methods to reduce the attack surface.
+    Consider using other mechanisms such as WebView's `postMessage` for more secure communication.
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - ";->addJavascriptInterface(Ljava/lang/Object;Ljava/lang/String;)V"

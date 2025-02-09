@@ -1,0 +1,30 @@
+id: shopify-access-token
+
+info:
+  name: Shopify Access Token
+  author: mohammad
+  severity: high
+  description: |
+    Detects Shopify Access Tokens used for authentication to access Shopify APIs.
+    If exposed, an attacker could potentially gain unauthorized access to the Shopify store's data and services.
+  remediation: |
+    - Revoke and regenerate the access token if exposed.
+    - Store access tokens securely using environment variables or a secrets manager.
+    - Implement OAuth with least privilege access for API integrations.
+    - Monitor and audit API usage to detect suspicious activity.
+  references:
+    - https://shopify.dev/docs/api/usage/authentication
+    - https://shopify.dev/docs/apps/auth/oauth
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "shpat_[a-fA-F0-9]{32}"

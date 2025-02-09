@@ -1,0 +1,37 @@
+id: android-log-sensitive-data-strict
+info:
+  name: Android Sensitive Data in Log Files - Strict
+  author: mohammad
+  severity: high
+  description: Detects logging of sensitive information, such as passwords, tokens, or API keys, which can expose user credentials or other secrets.
+  tags: android, security, logging, sensitive-data
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      # Match Android Log methods (e.g., Log.d, Log.e, Log.i, Log.v, Log.w)
+      - type: regex
+        regex:
+          - 'Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'
+        condition: and
+
+      # Match sensitive data patterns (e.g., passwords, tokens, API keys)
+      - type: regex
+        regex:
+          - '(".*?(password|api[_-]?key|token|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?"\s*\+)'
+          - '(".*?([A-Za-z0-9+/]{40,}|[A-Za-z0-9-_]{32,}|[A-Za-z0-9]{20,}).*?"\s*\+)'  # Matches long strings (e.g., tokens, hashes)
+        condition: and
+
+      # Match System.out.println (Java) with sensitive data
+      - type: regex
+        regex:
+          - 'System\.out\.println\s*\(.*?(password|api[_-]?key|token|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?\)'
+        condition: or
+
+      # Exclude common false positives (e.g., generic log messages)
+      - type: regex
+        regex:
+          - '(".*?(debug|info|error|warning|verbose|success|start|end|initialized|loaded).*?")'
+        negative: true  # Exclude these patterns

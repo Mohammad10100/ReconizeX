@@ -1,0 +1,20 @@
+id: content-scheme
+
+info:
+  name: Content Scheme Enabled
+  author: mohammad  
+  severity: info
+  description: "Detects if an Android app uses the 'content' scheme, which could indicate potential issues with URI handling."
+  reference:
+    - https://developer.android.com/reference/android/content/ContentResolver#openInputStream(android.net.Uri)
+  remediation: "Review and validate URI handling logic to prevent security issues such as Insecure Content Providers."
+
+file:
+  - extensions:
+      - xml
+
+    matchers:
+      - type: regex  
+        regex:
+          - "android:scheme=\"content\""
+        case-insensitive: true 

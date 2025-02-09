@@ -1,0 +1,24 @@
+id: webview-load-url
+
+info:
+  name: Webview loadUrl Usage
+  author: mohammad
+  severity: medium
+  description: |
+    Detects usage of the `loadUrl` method in WebView, which can pose security risks if used improperly.
+    Loading untrusted URLs in WebView can lead to various vulnerabilities such as Cross-Site Scripting (XSS), data leakage, or unauthorized actions.
+  reference:
+    - https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)
+  remediation: |
+    Avoid loading untrusted URLs in WebViews, especially URLs with user input.
+    If loading external content, ensure that the URLs are trusted and properly sanitized.
+    Additionally, consider using `WebView.loadData` with sanitized content or implement more restrictive loading policies like whitelisting domains.
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - "Landroid/webkit/WebView;->loadUrl(Ljava/lang/String;)V"

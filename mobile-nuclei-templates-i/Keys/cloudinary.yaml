@@ -1,0 +1,23 @@
+id: cloudinary-basic-auth
+
+info:
+  name: Cloudinary Basic Auth
+  author: mohammad
+  severity: high
+  description: "Detects Cloudinary credentials in files, which can expose sensitive authentication details."
+  reference:
+    - https://cloudinary.com/documentation
+  remediation: "Remove hardcoded Cloudinary credentials from source files and use environment variables or a secure secrets manager."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "cloudinary:\\/\\/\\d+:[0-9A-Za-z\\-_.:/]+@[0-9A-Za-z\\-_]+"

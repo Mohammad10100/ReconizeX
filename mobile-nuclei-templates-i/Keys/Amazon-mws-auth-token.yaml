@@ -1,0 +1,29 @@
+id: amazon-mws-auth-token
+
+info:
+  name: Amazon MWS Auth Token Exposure
+  author: mohammad
+  severity: high
+  description: |
+    Detects leaked Amazon Marketplace Web Service (MWS) Auth Tokens in decompiled APKs. 
+    Exposure can allow unauthorized access to seller account data, leading to API abuse and data breaches.
+  reference:
+    - https://developer.amazonservices.com/
+    - https://docs.developer.amazonservices.com/en_US/dev_guide/DG_EU_Authentication.html
+  remediation: |
+    - Revoke the exposed MWS Auth Token from the Amazon Developer Console.
+    - Rotate credentials and issue a new token.
+    - Store sensitive tokens securely using environment variables or a secrets manager.
+    - Prevent hardcoding secrets in APKs and use obfuscation techniques.
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+    extractors:
+      - type: regex
+        regex:
+          - "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"

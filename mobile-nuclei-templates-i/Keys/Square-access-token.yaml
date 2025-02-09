@@ -1,0 +1,29 @@
+id: square-access-token
+
+info:
+  name: Square Access Token
+  author: mohammad
+  severity: high
+  description: |
+    Detects Square Access Tokens, which are used for authenticating API requests to Square services. These tokens grant access to Square's platform, allowing users to process payments, manage customers, and access various resources. If compromised, attackers can use the token to gain unauthorized access to the associated Square account.
+  remediation: |
+    - Immediately regenerate the Square access token to invalidate the compromised one.
+    - Secure access tokens by storing them in environment variables or secret management systems.
+    - Ensure tokens are not hardcoded in source code, especially in public repositories.
+    - Restrict API access by IP or implement OAuth to limit token exposure.
+  references:
+    - https://developer.squareup.com/docs/authentication
+    - https://developer.squareup.com/docs/build-basics/access-tokens
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "sq0atp-[0-9A-Za-z\\-_]{22}"

@@ -1,0 +1,29 @@
+id: twilio-api
+
+info:
+  name: Twilio API Key
+  author: mohammad
+  severity: high
+  description: |
+    Detects Twilio API keys, which are used to authenticate requests to the Twilio platform. These keys provide access to SMS, voice, and other communication services. If exposed, attackers can misuse these keys to send unauthorized messages, make phone calls, or access sensitive data in your Twilio account.
+  remediation: |
+    - Immediately revoke any exposed Twilio API keys in the Twilio Console.
+    - Regenerate new API keys and update your application with the new keys.
+    - Use environment variables or a secure secrets management system to store API keys, instead of embedding them directly in the source code.
+    - Monitor your Twilio account for any unauthorized activities or suspicious transactions.
+  references:
+    - https://www.twilio.com/docs/usage/security/api-keys
+    - https://www.twilio.com/docs/usage/security/best-practices
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "(?i)twilio(.{0,20})?SK[0-9a-f]{32}"

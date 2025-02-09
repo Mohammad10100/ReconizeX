@@ -1,0 +1,29 @@
+id: private-key
+
+info:
+  name: Private Key Detect
+  author: mohammad
+  severity: high
+  description: "Detects private keys embedded in source code, which can lead to unauthorized access to systems and services if exposed."
+  reference:
+    - https://www.ssh.com/academy/ssh/private-key
+  remediation: "Ensure private keys are stored securely using environment variables or secure vaults. Never hardcode private keys in source code."
+
+file:
+  - extensions:
+      - smali
+      - xml
+      - json
+      - properties
+      - txt
+
+    extractors:
+      - type: regex
+        regex:
+          - "\"BEGIN OPENSSH PRIVATE KEY\""
+          - "\"BEGIN PRIVATE KEY\""
+          - "\"BEGIN RSA PRIVATE KEY\""
+          - "\"BEGIN DSA PRIVATE KEY\""
+          - "\"BEGIN EC PRIVATE KEY\""
+          - "\"BEGIN PGP PRIVATE KEY BLOCK\""
+          - "\"ssh-rsa\""
