@@ -1,9 +1,9 @@
-# ReconizerX ## – Unveiling Hidden Vulnerabilities in Android Apps
+# ReconizeX ## – Unveiling Hidden Vulnerabilities in Android Apps
 ### For Static Analysis 🎯
 
 Template Based Static Analysis of Android Applications 
 
-Find secrets, keys, weak coding practices & many more. Check [Features](https://github.com/utkarsh24122/apknuke#features-) & [Screenshots](https://github.com/mohammad10100/ReconizerX#-screenshots)
+Find secrets, keys, weak coding practices & many more. Check [Features](https://github.com/utkarsh24122/apknuke#features-) & [Screenshots](https://github.com/mohammad10100/ReconizeX#-screenshots)
 
 These templates are derived from open-source mobile-nuclei-templates by Optiv Security and [@0xgaurang](https://twitter.com/0xgaurang)
 This App is inspired from [apknuke](https://github.com/utkarsh24122/apknuke)
@@ -11,9 +11,9 @@ This App is inspired from [apknuke](https://github.com/utkarsh24122/apknuke)
 
 # ⚙ Setup
 ```
-$ git clone https://github.com/mohammad10100/ReconizerX
-$ cd ReconizerX
-$ chmod +x reconizerx.sh
+$ git clone https://github.com/mohammad10100/ReconizeX
+$ cd ReconizeX
+$ chmod +x reconizex.py
 ```
 install apktool ([Read How](https://ibotpeaches.github.io/Apktool/install/))
 required: [python](https://www.python.org/downloads/)
@@ -29,7 +29,7 @@ PATH_TO_NucleiTemplates="/[path]/mobile-nuclei-templates-i/"
 # 💻 Usage 
 ## Intense Mode
 ```
-python3 reconizerx.py <target.apk>
+python3 reconizex.py <target.apk>
 
 1
 
@@ -38,7 +38,7 @@ python3 reconizerx.py <target.apk>
 
 ## Restricted Mode
 ```
-python3 reconizerx.py <target.apk>
+python3 reconizex.py <target.apk>
 
 2
 
