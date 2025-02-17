@@ -1,26 +1,36 @@
-id: android-sql-injection
+id: android-ssl-misconfiguration
 info:
-  name: Android SQL Injection Detection
+  name: Android SSL Misconfiguration Detection
   author: mohammad
   severity: high
-  description: Detects improper neutralization of special elements in SQL commands, which can lead to SQL injection vulnerabilities.
-  tags: android,security,sql-injection,sqlite
+  description: |
+    Detects improper SSL configuration or usage of insecure SSL protocols/ciphers, which may lead to Man-in-the-Middle (MITM) attacks or data interception.
+  tags: android, security, ssl, misconfiguration, https
 
 file:
   - extensions:
       - smali
       - java
     matchers:
+      # Detects usage of insecure SSL context initialization
       - type: regex
         regex:
-          - 'Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;'
-          - 'Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;'
+          - 'Ljavax/net/ssl/SSLContext;->getInstance\(Ljava/lang/String;\)' # Checks for SSLContext initialization
+        condition: or
+      # Detects SSL socket factories being used without proper validation
       - type: regex
         regex:
-          - '("[^"]*\s*(SELECT|INSERT|UPDATE|DELETE)\s+.*?\s*(FROM|INTO|SET)\s+.*?"\s*\+)'
+          - 'Ljavax/net/ssl/SSLSocketFactory;->setDefault\(Ljavax/net/ssl/SSLSocketFactory;\)' # Checks for setting default SSL factory
+        condition: or
+      # Detects the usage of insecure SSL protocols like SSLv3 or TLSv1
       - type: regex
         regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;.*?\)'
+          - '"SSLv3"'
+          - '"TLSv1"'
+          - '"TLSv1_1"'
+        condition: or
+      # Detects SSL certificate validation bypass
       - type: regex
         regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;.*?\)'
+          - 'trustAllCertificates\(.*?\)' # Bypassing SSL certificate verification
+        condition: or

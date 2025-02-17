@@ -10,6 +10,18 @@ file:
   - extensions:
       - smali
     matchers:
+      # Detect java.util.Random instantiation
       - type: regex
         regex:
           - 'new-instance\s+\S+,\s+Ljava/util/Random;'
+      
+      # Detect Math.random() calls
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/Math;->random\(\)D'
+
+      # Exclude SecureRandom (false positives filtering)
+      - type: regex
+        regex:
+          - 'new-instance\s+\S+,\s+Ljava/security/SecureRandom;'
+        negative: true  # Exclude these patterns

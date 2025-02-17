@@ -1,26 +1,33 @@
-id: android-sql-injection
+id: android-clipboard-data-leak
 info:
-  name: Android SQL Injection Detection
+  name: Android Clipboard Data Leak Detection
   author: mohammad
   severity: high
-  description: Detects improper neutralization of special elements in SQL commands, which can lead to SQL injection vulnerabilities.
-  tags: android,security,sql-injection,sqlite
+  description: Detects potential clipboard data leakage in Android applications, which may allow sensitive data to be accessed by other apps or attackers.
+  tags: android, security, clipboard, data-leak
 
 file:
   - extensions:
       - smali
       - java
     matchers:
+      # Detects direct access to the clipboard
       - type: regex
         regex:
-          - 'Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;'
-          - 'Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;'
+          - 'Landroid/content/ClipboardManager;->getPrimaryClip\(\)' # Access clipboard content
+          - 'Landroid/content/ClipboardManager;->setPrimaryClip\(\)' # Setting clipboard content
+      # Detects cases where clipboard data is used without proper checks or validation
       - type: regex
         regex:
-          - '("[^"]*\s*(SELECT|INSERT|UPDATE|DELETE)\s+.*?\s*(FROM|INTO|SET)\s+.*?"\s*\+)'
+          - 'getText\(\)' # Get clipboard text without proper validation
+          - 'setText\(\)' # Set text to clipboard without proper validation
+      # Detects storing clipboard data in logs or other insecure locations
       - type: regex
         regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;.*?\)'
+          - 'Log\.d\(\s*"TAG",\s*"[^"]*clip[^"]*"\)' # Storing clipboard data in logs
+          - 'Log\.e\(\s*"TAG",\s*"[^"]*clip[^"]*"\)' # Error logging of clipboard data
+      # Detects clipboard content being shared across activities or between apps
       - type: regex
         regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;.*?\)'
+          - 'startActivity\(\s*new Intent\(.*?\)\s*\)' # Starting activity potentially sharing clipboard content
+        condition: or

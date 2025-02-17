@@ -4,23 +4,24 @@ info:
   author: mohammad
   severity: high
   description: Detects improper neutralization of special elements in SQL commands, which can lead to SQL injection vulnerabilities.
-  tags: android,security,sql-injection,sqlite
+  tags: android, security, sql-injection, sqlite
 
 file:
   - extensions:
       - smali
       - java
     matchers:
+      # Detect direct usage of rawQuery() and execSQL()
       - type: regex
         regex:
           - 'Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;'
           - 'Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;'
+        condition: or
+
+      # Detect user input concatenation inside SQL strings
       - type: regex
         regex:
-          - '("[^"]*\s*(SELECT|INSERT|UPDATE|DELETE)\s+.*?\s*(FROM|INTO|SET)\s+.*?"\s*\+)'
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->rawQuery\(Ljava/lang/String;.*?\)'
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;.*?\)'
+          - '"[^"]*\s*(SELECT|INSERT|UPDATE|DELETE)\s+.*?\s*(FROM|INTO|SET)\s+.*?"\s*\+' # SQL keyword usage in concatenation
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)' # String concatenation
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)' # String concatenation
+        condition: and

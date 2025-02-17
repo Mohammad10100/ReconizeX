@@ -10,11 +10,11 @@ file:
   - extensions:
       - smali
     matchers:
-      # Match hardcoded cryptographic keys (e.g., base64 encoded strings)
+      # Match hardcoded cryptographic keys (e.g., base64-encoded or hex keys)
       - type: regex
         regex:
-          - 'const-string\s+v\d+,\s*"[A-Za-z0-9+/=]{16,}"'  # Matches base64-like strings
-          - 'const-string\s+v\d+,\s*"[A-Fa-f0-9]{32,}"'    # Matches hex-encoded strings (e.g., AES keys)
+          - 'const-string\s+v\d+,\s*"[A-Za-z0-9+/=]{32,}"'  # Stricter base64 (32+ chars)
+          - 'const-string\s+v\d+,\s*"[A-Fa-f0-9]{64,}"'     # Stricter hex (64+ chars, AES-256)
         condition: or
 
       # Match cryptographic key usage (e.g., SecretKeySpec initialization)
@@ -24,8 +24,10 @@ file:
           - 'invoke-direct\s+\{.*?\},\s+Ljavax/crypto/spec/SecretKeySpec;-><init>\(\[BLjava/lang/String;\)V'
         condition: and
 
-      # Exclude common false positives (e.g., non-cryptographic strings)
+      # Exclude common false positives (URLs, test values, UUIDs)
       - type: regex
         regex:
-          - 'const-string\s+v\d+,\s*".*?(http|https|www|example|test|dummy).*?"'
+          - 'const-string\s+v\d+,\s*".*?(http|https|www|example|test|dummy|uuid|token|apikey).*?"'
+          - 'const-string\s+v\d+,\s*"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"'  # UUIDs
+          - 'const-string\s+v\d+,\s*"[0-9]{6,}"'  # Common test values like "123456"
         negative: true  # Exclude these patterns

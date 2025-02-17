@@ -14,14 +14,16 @@ file:
       # Match Android Log methods (e.g., Log.d, Log.e, Log.i, Log.v, Log.w)
       - type: regex
         regex:
-          - 'Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'
+          - 'Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'  # Log methods
+          - 'invoke-static\s+\{.*?\},\s+Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'  # Ensure invocation detection
         condition: and
 
-      # Match sensitive data patterns (e.g., passwords, tokens, API keys)
+      # Match sensitive data patterns (passwords, API keys, tokens, secrets)
       - type: regex
         regex:
           - '(".*?(password|api[_-]?key|token|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?"\s*\+)'
           - '(".*?([A-Za-z0-9+/]{40,}|[A-Za-z0-9-_]{32,}|[A-Za-z0-9]{20,}).*?"\s*\+)'  # Matches long strings (e.g., tokens, hashes)
+          - '"(?:AKIA|AIza|sk_live|ghp)[A-Za-z0-9]{20,}"'  # AWS, Google, Stripe, GitHub keys
         condition: and
 
       # Match System.out.println (Java) with sensitive data
@@ -30,8 +32,8 @@ file:
           - 'System\.out\.println\s*\(.*?(password|api[_-]?key|token|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?\)'
         condition: or
 
-      # Exclude common false positives (e.g., generic log messages)
+      # Exclude common false positives (e.g., generic log messages, debug logs)
       - type: regex
         regex:
-          - '(".*?(debug|info|error|warning|verbose|success|start|end|initialized|loaded).*?")'
+          - '(".*?(debug|info|error|warning|verbose|success|start|end|initialized|loaded|status|config|message).*?")'
         negative: true  # Exclude these patterns

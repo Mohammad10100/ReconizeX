@@ -4,7 +4,7 @@ info:
   author: mohammad
   severity: high
   description: |
-    The application does not prevent overlay attacks (tapjacking), making it vulnerable to clickjacking attacks.
+    Detects applications that do not prevent overlay attacks (tapjacking), making them vulnerable to clickjacking attacks.
   reference:
     - https://developer.android.com/reference/android/view/View#setFilterTouchesWhenObscured(boolean)
     - https://support.google.com/accessibility/android/answer/11183340
@@ -13,22 +13,24 @@ info:
 file:
   - extensions:
       - xml
-  - pattern: '<application[^>]*android:allowTaskReparenting="true"[^>]*>'
-    matchers-condition: or
-  - pattern: '<activity[^>]*android:windowSoftInputMode="stateAlwaysVisible"[^>]*>'
-    matchers-condition: or
-  - pattern: '<application[^>]*android:secure="false"[^>]*>'
-    matchers-condition: or
-  - pattern: 'setFilterTouchesWhenObscured\(false\)'
-    matchers-condition: or
-  - pattern: 'setFlags\(WindowManager\.LayoutParams\.FLAG_SECURE, 0\)'
+      - smali
+      - java
+    matchers:
+      # Detect cases where touch filtering is disabled in Java/Smali code
+      - type: regex
+        regex:
+          - 'setFilterTouchesWhenObscured\(false\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/view/View;->setFilterTouchesWhenObscured\(Z\)V'
 
-matchers:
-  - type: regex
-    part: body
-    regex:
-      - '<application[^>]*android:allowTaskReparenting="true"[^>]*>'
-      - '<activity[^>]*android:windowSoftInputMode="stateAlwaysVisible"[^>]*>'
-      - '<application[^>]*android:secure="false"[^>]*>'
-      - 'setFilterTouchesWhenObscured\(false\)'
-      - 'setFlags\(WindowManager\.LayoutParams\.FLAG_SECURE, 0\)'
+      # Detect FLAG_SECURE usage in critical UI flows (e.g., login, sensitive activity screens)
+      - type: regex
+        regex:
+          - 'setFlags\(WindowManager\.LayoutParams\.FLAG_SECURE, 0\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/view/Window;->setFlags\(I,I\)V'
+
+      # Ensure that the 'secure' flag is false for critical views like login screens
+      - type: regex
+        part: body
+        regex:
+          - '<application[^>]*android:secure="false"[^>]*>'
+          - '<activity[^>]*android:secure="false"[^>]*>'

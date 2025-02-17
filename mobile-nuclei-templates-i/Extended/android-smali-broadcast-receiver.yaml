@@ -10,23 +10,29 @@ file:
   - extensions:
       - smali
     matchers:
-      # Match intent data retrieval (action, extras, data)
+      # Match intent data retrieval and usage in sensitive contexts (startActivity, sendBroadcast, etc.)
       - type: regex
         regex:
           - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->(getAction|getExtras|getData|getParcelableExtra)\(.*?\).*?'
         condition: and
 
-      # Ensure no validation is performed on the retrieved data
+      # Ensure no validation occurs after retrieving intent data (i.e., missing checks for equality or nullity)
       - type: regex
         regex:
           - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->equals\(Ljava/lang/Object;\)Z'  # Check for equals() validation
           - 'if-eqz\s+.*?,\s+.*?'  # Check for null or equality checks
           - 'if-nez\s+.*?,\s+.*?'
-        negative: true  # Negate this condition (i.e., ensure these patterns are NOT present)
+        negative: true  # Ensure these patterns are NOT present
 
-      # Ensure the retrieved data is used in a sensitive context
+      # Ensure the retrieved data is used in critical methods without proper validation
       - type: regex
         regex:
-          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Context;->(startActivity|sendBroadcast|startService)\(.*?\).*?'  # Sensitive methods
+          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Context;->(startActivity|sendBroadcast|startService)\(.*?\).*?'  # Sensitive methods like startActivity
           - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Intent;->(setClass|setComponent|setPackage)\(.*?\).*?'  # Intent manipulation
-        condition: or
+        condition: and
+
+      # Add a rule to catch suspicious use of intent data without validation
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->getAction\(\).*?'
+        negative: true  # Ensure there's no direct action check without validation

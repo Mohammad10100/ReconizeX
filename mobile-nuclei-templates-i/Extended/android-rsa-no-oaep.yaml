@@ -4,15 +4,34 @@ info:
   author: mohammad
   severity: high
   description: Detects usage of RSA encryption without OAEP padding, which can lead to security vulnerabilities.
-  tags: android,security,rsa,cryptography,smali
+  tags: android, security, rsa, cryptography, smali
 
 file:
   - extensions:
       - smali
+    matchers-condition: and  # Ensure all conditions must be met
     matchers:
+      # Detect insecure RSA padding (PKCS1Padding, NoPadding)
       - type: regex
         regex:
           - 'const-string\s+v\d+,\s*"RSA/ECB/PKCS1Padding"'
+          - 'const-string\s+v\d+,\s*"RSA/ECB/NoPadding"'
+        condition: or
+
+      # Ensure that OAEP padding is NOT used
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"RSA/ECB/OAEPWithSHA-1AndMGF1Padding"'
+        negative: true  # This excludes valid OAEP usage
+
+      # Detect calls to Cipher.getInstance with insecure padding
       - type: regex
         regex:
           - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+
+      # Match code calling Cipher.init (for encryption/decryption)
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljavax/crypto/Cipher;->init\(ILjava/security/Key;Ljava/security/SecureRandom;\)V'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljavax/crypto/Cipher;->init\(ILjava/security/Key;Ljava/security/SecureRandom;Ljava/security/AlgorithmParameters;\)V'
+        condition: or

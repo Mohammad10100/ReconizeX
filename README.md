@@ -27,8 +27,23 @@ PATH_TO_NucleiTemplates="/[path]/mobile-nuclei-templates-i/"
 ```
 
 # 💻 Usage 
+## Intense Mode
 ```
 python3 reconizerx.py <target.apk>
+
+1
+
+```
+
+
+## Restricted Mode
+```
+python3 reconizerx.py <target.apk>
+
+2
+
+<your.package.name> (e.g. com.example.app)
+
 ```
 # Features ✨
 

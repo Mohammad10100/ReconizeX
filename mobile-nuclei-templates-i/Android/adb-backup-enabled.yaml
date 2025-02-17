@@ -3,7 +3,7 @@ id: adb-backup-enabled
 info:
   name: ADB Backup Enabled
   author: mohammad
-  severity: lowwwer
+  severity: low
   description: "Detects if android:allowBackup is set to true in AndroidManifest.xml."
   reference:
     - https://developer.android.com/guide/topics/data/autobackup

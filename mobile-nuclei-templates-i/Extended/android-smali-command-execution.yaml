@@ -13,14 +13,15 @@ file:
       # Match command execution methods (Runtime.exec or ProcessBuilder)
       - type: regex
         regex:
-          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(Ljava/lang/String;\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(.*?\)'
           - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;-><init>\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;->command\(.*?\)'
         condition: or
 
       # Match suspicious command strings (e.g., shell commands, binaries)
       - type: regex
         regex:
-          - 'const-string\s+\S+,\s*".*?(rm -rf|cat /proc/self/environ|wget|curl|chmod|chown|nc|sh|busybox).*?"'
+          - 'const-string\s+\S+,\s*".*?(rm -rf|cat /proc/self/environ|wget|curl|chmod|chown|nc|sh|busybox|su|id|ls|whoami|base64|echo|awk|sed).*?"'
         condition: and
 
       # Match cases where user input or dynamic data is manipulated
@@ -28,4 +29,17 @@ file:
         regex:
           - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->replaceAll\(Ljava/lang/String;Ljava/lang/String;\)'
           - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->insert\(I,Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuffer;->append\(Ljava/lang/String;\)'
+        condition: and
+
+      # Ensure the command is user-controlled (e.g., derived from user input or external sources)
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->valueOf\(Ljava/lang/Object;\)Ljava/lang/String;'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->toString\(\)Ljava/lang/String;'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)Ljava/lang/String;'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->substring\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->replace\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->format\(.*?\)'
         condition: and

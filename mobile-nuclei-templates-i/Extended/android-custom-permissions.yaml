@@ -9,7 +9,20 @@ info:
 file:
   - extensions:
       - xml
+    matchers-condition: or  # At least one matcher should trigger
     matchers:
       - type: regex
         regex:
-          - '<permission\s+.*?android:protectionLevel=".*?".*?>'
+          # Detect all custom permissions with android:name
+          - '<permission\s+.*?android:name="[^"]+".*?>'
+
+      - type: regex
+        regex:
+          # Detect permissions with explicit protection levels (normal, dangerous, or signatureOrSystem)
+          - '<permission\s+.*?android:protectionLevel="(normal|dangerous|signatureOrSystem)".*?>'
+
+      - type: regex
+        regex:
+          # Detect permissions missing android:protectionLevel (Alternative approach)
+          - '<permission\s+.*?android:name="[^"]+"(?:\s+[^>]*)?>'
+        negative: true  # This ensures it only triggers when protectionLevel is missing

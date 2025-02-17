@@ -9,8 +9,8 @@ info:
 file:
   - extensions:
       - smali
-      - java
     matchers:
       - type: regex
         regex:
           - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/SharedPreferences\$Editor;->putString\(Ljava/lang/String;Ljava/lang/String;\)Landroid/content/SharedPreferences\$Editor;'
+          - 'const-string\s+\{.*?\},\s+"(password|token|apikey|auth|secret|credential|jwt|session_id|private_key)"'

@@ -17,4 +17,3 @@ file:
       - type: regex
         regex:
           - "android:debuggable=\"true\""
-        case-insensitive: true

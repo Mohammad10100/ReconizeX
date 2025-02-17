@@ -4,20 +4,32 @@ info:
   author: mohammad
   severity: high
   description: Detects deserialization of untrusted data in Smali, which may lead to remote code execution (RCE).
-  tags: android,security,smali,deserialization,rce
+  tags: android, security, smali, deserialization, rce
 
 file:
   - extensions:
       - smali
     matchers:
+      # Detect unsafe deserialization methods (ObjectInputStream, Parcel, etc.)
       - type: regex
         regex:
           - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/ObjectInputStream;->readObject\(\)Ljava/lang/Object;'
-      - type: regex
-        regex:
           - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/Parcel;->readParcelable\(\)Landroid/os/Parcelable;'
           - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/Parcel;->readSerializable\(\)Ljava/io/Serializable;'
         condition: or
+
+      # Detect untrusted data sources being deserialized (e.g., network, file, IPC)
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/net/Socket;->getInputStream\(\)Ljava/io/InputStream;'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/FileInputStream;-><init>\(Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/Bundle;->getSerializable\(Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->getSerializableExtra\(Ljava/lang/String;\)'
+        condition: and
+
+      # Detect DexClassLoader being used with untrusted input
       - type: regex
         regex:
           - 'invoke-virtual\s+\{.*?\},\s+Ldalvik/system/DexClassLoader;->loadClass\(Ljava/lang/String;\)Ljava/lang/Class;'
+          - 'invoke-direct\s+\{.*?\},\s+Ldalvik/system/DexClassLoader;-><init>\(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;\)'
+        condition: and

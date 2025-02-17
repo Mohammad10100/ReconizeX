@@ -11,7 +11,7 @@ info:
 
 file:
   - extensions:
-      -- smali
+      - smali
       - xml
       - json
       - properties
