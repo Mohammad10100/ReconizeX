@@ -1,0 +1,39 @@
+id: android-insecure-file-storage
+
+info:
+  name: Android Insecure File Storage Detection
+  author: mohammad
+  severity: high
+  description: Detects insecure file storage methods, such as world-readable/writable files, use of external storage, and improper encryption.
+  tags: android, security, storage, file, smali
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      # Detects AndroidManifest.xml allowing insecure file storage
+      - type: regex
+        regex:
+          - '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"'
+          - '<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"'
+        condition: or
+
+  - extensions:
+      - smali
+    matchers:
+      # Detects insecure file storage methods
+      - type: regex
+        regex:
+          - 'Landroid/content/Context;->openFileOutput\(Ljava/lang/String;I\)Ljava/io/FileOutputStream;'
+          - 'Landroid/content/Context;->MODE_WORLD_READABLE'
+          - 'Landroid/content/Context;->MODE_WORLD_WRITEABLE'
+          - 'Landroid/os/Environment;->getExternalStorageDirectory\(\)Ljava/io/File;'
+        condition: or
+
+      # Detects lack of encryption in file storage
+      - type: regex
+        regex:
+          - 'Ljava/io/FileOutputStream;->write\(.*?\)'
+          - 'Ljava/io/FileWriter;->write\(.*?\)'
+        negative-regex: 'Ljavax/crypto/CipherOutputStream;->write\(.*?\)'
+        condition: and

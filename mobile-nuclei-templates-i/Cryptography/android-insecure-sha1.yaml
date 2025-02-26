@@ -1,0 +1,30 @@
+id: android-insecure-sha1
+
+info:
+  name: Android Insecure SHA-1 Hash Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the insecure SHA-1 hashing algorithm in Smali bytecode, which is vulnerable to collision attacks.
+    SHA-1 is not collision-resistant and should not be used for cryptographic signatures or secure hashing.
+    It is recommended to replace SHA-1 with SHA-256 or SHA-3.
+  tags: android, security, crypto, hash, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect SHA-1 usage in Smali constants
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"(SHA1|SHA-1)"'
+
+      # Detect SHA-1 usage in MessageDigest.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljava/security/MessageDigest;->getInstance\(Ljava/lang/String;\)Ljava/security/MessageDigest;'
+
+      # Detect SHA-1 usage in DigestUtils (Apache Commons)
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Lorg/apache/commons/codec/digest/DigestUtils;->(getSha1Digest|sha1|sha1Hex)\(.*?\)'

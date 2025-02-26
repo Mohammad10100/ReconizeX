@@ -1,0 +1,29 @@
+id: android-insecure-rc2
+
+info:
+  name: Android Insecure RC2 Cipher Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the insecure RC2 cipher in Smali bytecode, which is considered weak and vulnerable to cryptographic attacks.
+    RC2 encryption lacks modern security features and should be replaced with AES for better security.
+  tags: android, security, crypto, encryption, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect RC2 usage in Smali constants
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"RC2"'
+
+      # Detect RC2 usage in Cipher.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+
+      # Detect RC2 usage in SecretKeyFactory.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/SecretKeyFactory;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/SecretKeyFactory;'

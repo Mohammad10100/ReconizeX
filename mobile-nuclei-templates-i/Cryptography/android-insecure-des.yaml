@@ -1,0 +1,22 @@
+id: android-insecure-des
+
+info:
+  name: Android Insecure DES Cipher Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the DES cipher in Smali bytecode, which is considered weak due to its small key size (56-bit) and vulnerability to brute-force attacks.
+    Applications should replace DES with AES for better security.
+  tags: android, security, crypto, encryption, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect DES usage in Smali
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"DES"'
+          - 'const-string\s+v\d+,\s*".*?/DES/.*"'
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+        condition: and

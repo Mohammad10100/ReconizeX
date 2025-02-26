@@ -1,0 +1,28 @@
+id: android-dynamic-code-loading
+
+info:
+  name: Android Dynamic Code Loading Detection
+  author: mohammad
+  severity: critical
+  description: Detects dynamic code loading mechanisms such as DexClassLoader, PathClassLoader, and native JNI calls, which can be used for code injection or evasion techniques.
+  tags: android, security, dynamic-loading, dex, jni, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detects DexClassLoader and PathClassLoader usage
+      - type: regex
+        regex:
+          - 'Ldalvik/system/DexClassLoader;-><init>\(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;\)'
+          - 'Ldalvik/system/PathClassLoader;-><init>\(Ljava/lang/String;Ljava/lang/ClassLoader;\)'
+        condition: or
+
+      # Detects System.loadLibrary and System.load for native JNI loading
+      - type: regex
+        regex:
+          - 'Ljava/lang/System;->loadLibrary\(Ljava/lang/String;\)V'
+          - 'Ljava/lang/System;->load\(Ljava/lang/String;\)V'
+          - 'Ljava/lang/Runtime;->getRuntime\(\)Ljava/lang/Runtime;'
+          - 'Landroid/app/Application;->onCreate\(\)V'
+        condition: or

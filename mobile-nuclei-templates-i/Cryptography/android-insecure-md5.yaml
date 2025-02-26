@@ -1,0 +1,24 @@
+id: android-weak-hash-algorithms
+
+info:
+  name: Android Weak Hash Algorithm Detection
+  author: mohammad
+  severity: high
+  description: Detects the usage of weak cryptographic hash functions such as MD5 and SHA-1, which are vulnerable to collisions and should be replaced with stronger alternatives like SHA-256.
+  tags: android, security, cryptography, md5, sha1, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detects MessageDigest usage with MD5 or SHA-1
+      - type: regex
+        regex:
+          - 'Ljava/security/MessageDigest;->getInstance\(Ljava/lang/String;\)Ljava/security/MessageDigest;'
+        condition: and
+
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*"MD5"'
+          - 'const-string\s+\S+,\s*"SHA-1"'
+        condition: or

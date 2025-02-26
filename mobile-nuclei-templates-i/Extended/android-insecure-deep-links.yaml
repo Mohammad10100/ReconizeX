@@ -1,0 +1,33 @@
+id: android-insecure-deep-links
+
+info:
+  name: Android Insecure Deep Link Detection
+  author: mohammad
+  severity: high
+  description: Detects exported activities with deep link handling that may allow unauthorized access or exploitation.
+  tags: android, security, deep-link, exported, smali, manifest
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      # Detect exported activities with intent-filters (deep links)
+      - type: regex
+        regex:
+          - '<activity\s+[^>]*android:exported="true"'
+        condition: and
+
+      # Ensure it contains an intent-filter with data scheme (deep linking)
+      - type: regex
+        regex:
+          - '<intent-filter>.*?<data\s+android:scheme="[^"]+".*?</intent-filter>'
+        condition: and
+        part: group(0)
+
+      # Ensure no permission is required for protection
+      - type: regex
+        regex:
+          - '<activity[^>]+android:permission='
+        negative: true
+        condition: and
+        part: group(0)

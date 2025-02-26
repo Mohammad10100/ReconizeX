@@ -1,0 +1,24 @@
+id: android-insecure-sha224
+
+info:
+  name: Android Insecure SHA-224 Hash Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the SHA-224 hashing algorithm in Smali bytecode, which is not widely recommended for cryptographic security.
+    It is advisable to replace SHA-224 with stronger alternatives like SHA-256 or SHA-3.
+  tags: android, security, crypto, hash, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect SHA-224 usage in Smali constants
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"(SHA-224)"'
+
+      # Detect SHA-224 usage in MessageDigest.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljava/security/MessageDigest;->getInstance\(Ljava/lang/String;\)Ljava/security/MessageDigest;'

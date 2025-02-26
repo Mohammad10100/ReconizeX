@@ -1,0 +1,30 @@
+id: android-insecure-rc4
+
+info:
+  name: Android Insecure RC4 Cipher Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the insecure RC4 (ARCFOUR) cipher in Smali bytecode, which is vulnerable to cryptographic attacks.
+    RC4 has known weaknesses, including biases and susceptibility to plaintext recovery attacks.
+    It is recommended to replace RC4 with AES for better security.
+  tags: android, security, crypto, encryption, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect RC4 or ARCFOUR usage in Smali constants
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"(RC4|ARCFOUR)"'
+
+      # Detect RC4 usage in Cipher.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+
+      # Detect RC4 usage in SecretKeyFactory.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/SecretKeyFactory;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/SecretKeyFactory;'

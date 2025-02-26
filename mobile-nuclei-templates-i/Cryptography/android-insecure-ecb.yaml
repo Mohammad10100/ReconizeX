@@ -1,0 +1,30 @@
+id: android-insecure-ecb
+
+info:
+  name: Android Insecure ECB Cipher Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the ECB (Electronic Codebook) cipher mode in Smali bytecode, which is insecure due to its lack of diffusion.
+    ECB encryption results in identical ciphertext blocks for identical plaintext blocks, making it vulnerable to pattern analysis.
+    It is recommended to use GCM instead of ECB.
+  tags: android, security, crypto, encryption, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect ECB mode in Smali constants
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".*?/ECB/.*"'
+
+      # Detect ECB usage in Cipher.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+
+      # Detect ECB mode usage in Android Keystore API (KeyGenParameterSpec)
+      - type: regex
+        regex:
+          - 'setBlockModes\(KeyProperties\.BLOCK_MODE_ECB\)'

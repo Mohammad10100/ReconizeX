@@ -1,0 +1,21 @@
+id: android-xor-obfuscation-detection
+info:
+  name: Android XOR-Based Obfuscation Detection
+  author: mohammad
+  severity: medium
+  description: Detects XOR-based obfuscation patterns in Smali or Java code, which may indicate hidden or encrypted strings.
+  tags: android, obfuscation, xor, smali, security
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - 'xor-int/lit8\s+\S+,\s+\S+,\s+0x[0-9a-fA-F]+'
+          - 'xor-int\s+\S+,\s+\S+,\s+\S+'
+          - 'xor-long\s+\S+,\s+\S+,\s+\S+'
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/Integer;->parseInt\(Ljava/lang/String;I\)'
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/Integer;->toHexString\(I\)'
+        condition: or

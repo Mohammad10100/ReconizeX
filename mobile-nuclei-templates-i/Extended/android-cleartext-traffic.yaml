@@ -1,0 +1,18 @@
+id: android-cleartext-traffic
+
+info:
+  name: Android Cleartext Traffic Detection
+  author: mohammad
+  severity: high
+  description: |
+    Detects usage of `android:usesCleartextTraffic="true"` in AndroidManifest.xml.
+    Allowing cleartext traffic (HTTP instead of HTTPS) can expose sensitive data to MITM attacks.
+  tags: android, security, cleartext, manifest, network
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - '<application[^>]*android:usesCleartextTraffic\s*=\s*"true"'

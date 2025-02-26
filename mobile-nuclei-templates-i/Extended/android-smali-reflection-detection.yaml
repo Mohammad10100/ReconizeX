@@ -1,0 +1,27 @@
+id: android-smali-reflection-detection
+
+info:
+  name: Android Reflection API Usage Detection
+  author: mohammad
+  severity: high
+  description: Detects usage of Java Reflection APIs in Smali code, which can be used for dynamic method invocation, hiding functionality, or evading static analysis.
+  tags: android, security, smali, reflection, dynamic-analysis
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect standard Java Reflection API usage
+      - type: regex
+        regex:
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Class;->forName\(.*?\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/reflect/Method;->invoke\(.*?\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ClassLoader;->loadClass\(.*?\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/reflect/Constructor;->newInstance\(.*?\)'
+
+      # Detect usage of reflection with dynamic/user-controlled input
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->valueOf\(Ljava/lang/Object;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)'
+        condition: and

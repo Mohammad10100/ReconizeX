@@ -1,0 +1,29 @@
+id: android-relative-path-traversal
+
+info:
+  name: Android Relative Path Traversal Detection
+  author: mohammad
+  severity: high
+  description: |
+    Detects improper input validation when constructing file paths, leading to Relative Path Traversal vulnerabilities.
+  tags: android, security, path-traversal, file-access, smali, java
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      # Detect cases where user input is directly used to build file paths
+      - type: regex
+        regex:
+          - 'new\s+Ljava/io/File;\(Ljava/lang/String;\)' # Creating file objects from unvalidated input
+          - 'Landroid/content/Context;->openFileInput\(Ljava/lang/String;\)Ljava/io/FileInputStream;' # Insecure file access
+          - 'Landroid/content/Context;->openFileOutput\(Ljava/lang/String;I\)Ljava/io/FileOutputStream;' # Writing files
+        condition: or
+
+      # Detect usage of relative path indicators (../) inside string variables
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*".*?\.\./.*?"' # Hardcoded relative path usage
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->replace\(Ljava/lang/CharSequence;Ljava/lang/CharSequence;\)' # Potential input sanitation bypass
+        condition: or

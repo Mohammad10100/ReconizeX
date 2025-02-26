@@ -1,0 +1,21 @@
+id: android-insecure-blowfish
+
+info:
+  name: Android Insecure Blowfish Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the insecure Blowfish cipher in Android applications.
+    Blowfish is considered outdated and should be replaced with AES for stronger security.
+  tags: android, security, crypto, encryption, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect Blowfish in Smali bytecode
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"Blowfish"'
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+        condition: and

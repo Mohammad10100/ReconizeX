@@ -1,0 +1,36 @@
+id: android-improper-X.509-certificate-validation
+
+info:
+  name: Android Improper X.509 Certificate Validation
+  author: mohammad
+  severity: critical
+  description: |
+    Detects improper X.509 certificate validation methods in Android applications, which can lead to MITM attacks.
+    Common issues include allowing all certificates, ignoring SSL warnings, and overriding default trust managers.
+  tags: android, security, ssl, certificate, mitm
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      # Detects TrustManager implementations that accept all certificates
+      - type: regex
+        regex:
+          - 'new TrustManager\[\] \{[^}]*new X509TrustManager\(\) \{[^}]*public void checkServerTrusted\([^)]*\) throws CertificateException \{\}'
+          - 'public void checkServerTrusted\(.*?\) throws CertificateException \{\}' # Empty implementation
+        condition: or
+
+      # Detects usage of setDefaultHostnameVerifier that allows all hostnames
+      - type: regex
+        regex:
+          - 'setDefaultHostnameVerifier\(.*?\)' # Potentially insecure custom hostname verification
+          - 'ALLOW_ALL_HOSTNAME_VERIFIER' # Explicitly allowing all hostnames
+        condition: or
+
+      # Detects SSL socket factories being used without proper verification
+      - type: regex
+        regex:
+          - 'SSLSocketFactory.getDefault\(\)'
+          - 'SSLSocketFactory.createSocket\('
+        condition: or

@@ -1,0 +1,51 @@
+id: android-missing-anti-reverse-engineering
+
+info:
+  name: Missing Anti-Reverse Engineering Mechanisms
+  author: mohammad
+  severity: medium
+  description: Identifies the absence of common anti-reverse engineering techniques, such as anti-debugging, tamper detection, integrity verification, and obfuscation.
+  tags: android, security, reverse-engineering, anti-debugging, obfuscation
+
+file:
+  - extensions:
+      - smali
+    matchers-condition: and
+    matchers:
+      # Check for missing anti-debugging techniques
+      - type: regex
+        regex:
+          - 'Landroid/os/Debug;->isDebuggerConnected'
+          - 'Landroid/os/Debug;->waitForDebugger'
+        negative: true
+
+      # Check for missing signature verification
+      - type: regex
+        regex:
+          - 'Landroid/content/pm/PackageManager;->getPackageInfo'
+          - 'Landroid/content/pm/PackageInfo;->signatures'
+        negative: true
+
+      # Check for missing integrity verification
+      - type: regex
+        regex:
+          - 'Ljava/security/MessageDigest;->digest'
+          - 'Ljava/security/MessageDigest;->update'
+          - 'const-string\s+\S+,\s*"SHA-256"'
+        negative: true
+
+      # Check for missing environment checks (Frida, root detection)
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*"/proc/self/maps"'
+          - 'const-string\s+\S+,\s*"/system/bin/su"'
+          - 'const-string\s+\S+,\s*"frida-server"'
+        negative: true
+
+      # Check for missing code obfuscation indicators
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*"ProGuard"'
+          - 'const-string\s+\S+,\s*"R8"'
+          - 'const-string\s+\S+,\s*"DexGuard"'
+        negative: true

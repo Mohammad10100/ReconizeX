@@ -1,0 +1,31 @@
+id: android-insecure-md4
+
+info:
+  name: Android Insecure MD4 Hash Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of the insecure MD4 hashing algorithm in Smali bytecode, which is vulnerable to cryptographic attacks.
+    MD4 is considered weak due to its susceptibility to collision and pre-image attacks.
+    It is recommended to replace MD4 with SHA-256 or SHA-3 for better security.
+  tags: android, security, crypto, hash, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect MD4 usage in Smali constants
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"MD4"'
+
+      # Detect MD4 usage in MessageDigest.getInstance()
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljava/security/MessageDigest;->getInstance\(Ljava/lang/String;\)Ljava/security/MessageDigest;'
+
+      # Detect MD4 usage in Apache Commons DigestUtils
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Lorg/apache/commons/codec/digest/DigestUtils;->getMd4Digest\(\)Ljava/security/MessageDigest;'
+          - 'invoke-static\s+\{.*?\},\s+Lorg/apache/commons/codec/digest/DigestUtils;->md4\(.*?\)'

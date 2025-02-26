@@ -1,0 +1,38 @@
+id: android-ldap-injection
+
+info:
+  name: Android LDAP Injection Detection
+  author: mohammad
+  severity: high
+  description: |
+    Detects improper neutralization of user input in LDAP queries, which may lead to LDAP Injection.
+    If unvalidated input is used directly in an LDAP query, an attacker may manipulate the query structure.
+  tags: android, security, ldap, injection
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      # Detect LDAP query execution methods
+      - type: regex
+        regex:
+          - 'Ljavax/naming/directory/DirContext;->search\(Ljava/lang/String;Ljava/lang/String;Ljavax/naming/directory/SearchControls;\)'
+          - 'Ljavax/naming/directory/DirContext;->search\(Ljava/lang/String;Ljavax/naming/directory/SearchControls;\)'
+        condition: or
+
+      # Detect LDAP filters with user input concatenation
+      - type: regex
+        regex:
+          - '".*?\\(.*?=.*?\\)".*?\\+'  # (filter=...) + user input
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)' # StringBuilder concatenation
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)' # String concat method
+        condition: and
+
+      # Exclude safe usage (basic filtering without `negative`)
+      - type: regex
+        regex:
+          - 'Pattern\.compile\('  # Regex-based filtering, reduces false positives
+          - 'String\.replaceAll\('  # Input sanitization using replaceAll()
+          - 'escapeLDAPSearchFilter\('  # Custom LDAP escaping functions
+        condition: or

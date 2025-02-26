@@ -1,0 +1,21 @@
+id: android-insecure-cbc
+
+info:
+  name: Android Insecure CBC Mode Usage
+  author: mohammad
+  severity: warning
+  description: |
+    Detects the use of Cipher Block Chaining (CBC) mode with PKCS5/PKCS7 padding in Android applications.
+    CBC mode is vulnerable to Padding Oracle attacks and should be replaced with AES-GCM for stronger security.
+  tags: android, security, crypto, encryption, smali
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect CBC mode in Smali bytecode
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".*?/CBC/PKCS(5|7)Padding"'
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+        condition: and

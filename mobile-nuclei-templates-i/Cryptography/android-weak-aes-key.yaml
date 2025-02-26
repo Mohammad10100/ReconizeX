@@ -1,0 +1,32 @@
+id: android-insecure-3des
+
+info:
+  name: Android Insecure 3DES Usage
+  author: mohammad
+  severity: high
+  description: |
+    Detects the use of the insecure Triple DES (3DES) cipher, which is vulnerable to attacks like Sweet32.
+    Applications should replace 3DES with AES for better security.
+  tags: android, security, crypto, encryption
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      # Detect usage of 3DES in Cipher.getInstance
+      - type: regex
+        regex:
+          - 'Cipher\.getInstance\(".*?(3DES|DESede|DESEDEWRAP).*?"'
+      
+      # Detect usage of 3DES in SecretKeyFactory
+      - type: regex
+        regex:
+          - 'SecretKeyFactory\.getInstance\(".*?(DESede).*?"'
+
+      # Detect potential variable assignments with 3DES
+      - type: regex
+        regex:
+          - '\bCipher\s+\w+\s*=\s*Cipher\.getInstance\(".*?(3DES|DESede|DESEDEWRAP).*?"'
+          - '\bSecretKeyFactory\s+\w+\s*=\s*SecretKeyFactory\.getInstance\(".*?(DESede).*?"'
+        condition: or
