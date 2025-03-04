@@ -3,7 +3,7 @@ id: android-insecure-md4
 info:
   name: Android Insecure MD4 Hash Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure MD4 hashing algorithm in Smali bytecode, which is vulnerable to cryptographic attacks.
     MD4 is considered weak due to its susceptibility to collision and pre-image attacks.

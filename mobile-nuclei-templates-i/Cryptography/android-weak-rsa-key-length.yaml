@@ -1,32 +1,29 @@
-id: android-insecure-3des
+id: android-weak-rsa-key-length
 
 info:
-  name: Android Insecure 3DES Usage
+  name: Android Weak RSA Key Length
   author: mohammad
-  severity: high
+  severity: low
   description: |
-    Detects the use of the insecure Triple DES (3DES) cipher, which is vulnerable to attacks like Sweet32.
-    Applications should replace 3DES with AES for better security.
-  tags: android, security, crypto, encryption
+    Detects the use of weak RSA key lengths (less than 3072 bits), which are considered insecure.
+    It is recommended to use RSA keys of at least 3072 bits for cryptographic operations.
+  tags: android, security, cryptography, rsa, smali
 
 file:
   - extensions:
       - smali
-      - java
+    matchers-condition: and
     matchers:
-      # Detect usage of 3DES in Cipher.getInstance
+      # Detect KeyPairGenerator.getInstance("RSA")
       - type: regex
         regex:
-          - 'Cipher\.getInstance\(".*?(3DES|DESede|DESEDEWRAP).*?"'
-      
-      # Detect usage of 3DES in SecretKeyFactory
-      - type: regex
-        regex:
-          - 'SecretKeyFactory\.getInstance\(".*?(DESede).*?"'
+          - 'const-string\s+v\d+,\s*"RSA"'
+          - 'invoke-static\s+\{.*?\},\s+Ljava/security/KeyPairGenerator;->getInstance\(Ljava/lang/String;\)Ljava/security/KeyPairGenerator;'
+        condition: and
 
-      # Detect potential variable assignments with 3DES
+      # Detect RSA key length initialization (checking values below 3072)
       - type: regex
         regex:
-          - '\bCipher\s+\w+\s*=\s*Cipher\.getInstance\(".*?(3DES|DESede|DESEDEWRAP).*?"'
-          - '\bSecretKeyFactory\s+\w+\s*=\s*SecretKeyFactory\.getInstance\(".*?(DESede).*?"'
+          - 'const/16\s+v\d+,\s*1024'
+          - 'const/16\s+v\d+,\s*2048'
         condition: or

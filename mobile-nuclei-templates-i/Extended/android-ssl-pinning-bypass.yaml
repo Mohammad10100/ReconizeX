@@ -1,39 +1,36 @@
-id: android-unused-permissions
-
+id: android-ssl-pinning-bypass
 info:
-  name: Android Unused Permissions Detection
+  name: Android SSL Pinning Bypass Detection
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: critical
+  description: |
+    Detects weak or bypassable SSL certificate pinning implementations that could allow MITM attacks.
+  tags: android, security, ssl, pinning, mitm
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
+      - java
     matchers:
-      # Match API calls that require specific permissions
+      # Detects the presence of SSL Pinning but checks if it's weak
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'Ljavax/net/ssl/X509TrustManager;->checkServerTrusted\(.*?\)'  # Overrides trust manager
+          - 'Ljavax/net/ssl/TrustManager;->getAcceptedIssuers\(\)'  # Allows all issuers
+          - 'Landroid/net/http/X509TrustManagerExtensions;->checkServerTrusted\(.*?\)'  # Android-specific bypass
+        condition: or
 
-    condition: or
+      # Detects use of Frida SSL Bypass Hooks
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljavax/net/ssl/HttpsURLConnection;->setSSLSocketFactory\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljavax/net/ssl/SSLSocketFactory;->createSocket\(.*?\)'
+        condition: or
+
+      # Detects use of custom TrustManagers that ignore verification
+      - type: regex
+        regex:
+          - 'new\s+X509TrustManager\s*\(\)'
+          - 'new\s+TrustManager\s*\(\)'
+          - 'public\s+X509TrustManager\s+'
+        condition: or

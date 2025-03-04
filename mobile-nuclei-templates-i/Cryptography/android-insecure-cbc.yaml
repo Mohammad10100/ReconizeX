@@ -3,7 +3,7 @@ id: android-insecure-cbc
 info:
   name: Android Insecure CBC Mode Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of Cipher Block Chaining (CBC) mode with PKCS5/PKCS7 padding in Android applications.
     CBC mode is vulnerable to Padding Oracle attacks and should be replaced with AES-GCM for stronger security.

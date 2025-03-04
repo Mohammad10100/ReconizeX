@@ -1,39 +1,36 @@
-id: android-unused-permissions
+id: android-sdk-version-misconfiguration
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android SDK Version Validation
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: medium
+  description: |
+    Detects missing or misconfigured `minSdkVersion` and `targetSdkVersion` in AndroidManifest.xml or Gradle files.
+    Proper configuration is necessary to enforce security measures from newer Android versions.
+  tags: android, manifest, gradle, security, misconfiguration
 
 file:
   - extensions:
       - xml
+      - gradle
     matchers:
-      # Match declared permissions in AndroidManifest.xml
+      # Detect missing or weak minSdkVersion in AndroidManifest.xml
       - type: regex
         regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
+          - '<uses-sdk\s*[^>]*>'
+          - '<uses-sdk[^>]*android:minSdkVersion\s*=\s*"[0-9]|1[0-7]"' # Detects weak versions (0-17)
+        condition: or
 
-  - extensions:
-      - smali
-    matchers:
-      # Match API calls that require specific permissions
+      # Detect missing or weak targetSdkVersion in AndroidManifest.xml
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - '<uses-sdk\s*[^>]*>'
+          - '<uses-sdk[^>]*android:targetSdkVersion\s*=\s*"[0-9]|1[0-9]|2[0-5]"' # Detects outdated versions (below 26)
+        condition: or
 
-    condition: or
+      # Detect weak or missing SDK versions in Gradle files
+      - type: regex
+        regex:
+          - 'minSdkVersion\s+[0-9]|1[0-7]'   # Weak minSdkVersion
+          - 'targetSdkVersion\s+[0-9]|1[0-9]|2[0-5]'  # Outdated targetSdkVersion
+        condition: or

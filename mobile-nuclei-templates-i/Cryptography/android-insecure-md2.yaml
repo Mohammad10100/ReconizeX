@@ -3,7 +3,7 @@ id: android-insecure-md2
 info:
   name: Android Insecure MD2 Hash Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure MD2 hashing algorithm in Smali code.
     MD2 is vulnerable to cryptographic attacks and should be replaced with SHA-256 or SHA-3.

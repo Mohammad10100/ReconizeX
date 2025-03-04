@@ -1,39 +1,19 @@
-id: android-unused-permissions
+id: android-direct-boot-aware
 
 info:
   name: Android Unused Permissions Detection
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: medium
+  description: |
+    Detects `android:directBootAware="true"` in AndroidManifest.xml.
+    If misused, it may allow sensitive data to be accessed before device unlock, leading to potential security risks.
+  tags: android, manifest, security
 
 file:
   - extensions:
       - xml
     matchers:
-      # Match declared permissions in AndroidManifest.xml
       - type: regex
         regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
-      - smali
-    matchers:
-      # Match API calls that require specific permissions
-      - type: regex
-        regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
-
-    condition: or
+          - '<service[^>]*android:directBootAware\s*=\s*"true"'
+          - '<receiver[^>]*android:directBootAware\s*=\s*"true"'

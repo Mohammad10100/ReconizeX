@@ -1,39 +1,18 @@
-id: android-unused-permissions
+id: android-test-only-flag
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Test-Only Flag Detection
   author: mohammad
   severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  description: |
+    Detects the presence of `android:testOnly="true"` in AndroidManifest.xml. 
+    This flag should not be set in production APKs, as it prevents normal installation and may indicate a misconfiguration.
+  tags: android, manifest, misconfiguration
 
 file:
   - extensions:
       - xml
     matchers:
-      # Match declared permissions in AndroidManifest.xml
       - type: regex
         regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
-      - smali
-    matchers:
-      # Match API calls that require specific permissions
-      - type: regex
-        regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
-
-    condition: or
+          - '<application[^>]*android:testOnly\s*=\s*"true"'

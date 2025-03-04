@@ -1,39 +1,37 @@
-id: android-unused-permissions
+id: android-weak-root-detection
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Weak Root Detection Mechanisms
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: medium
+  description: Identifies weak or bypassable root detection mechanisms in Android applications, such as simple file existence checks or hardcoded root indicators.
+  tags: android, security, root-detection, smali
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
     matchers:
-      # Match API calls that require specific permissions
+      # Detect simple file existence checks for root indicators
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'const-string\s+\S+,\s*".*?/system/bin/su"'
+          - 'const-string\s+\S+,\s*".*?/system/xbin/su"'
+          - 'const-string\s+\S+,\s*".*?/sbin/su"'
+          - 'const-string\s+\S+,\s*".*?/system/app/Superuser.apk"'
+          - 'const-string\s+\S+,\s*".*?/data/local/bin/su"'
+          - 'const-string\s+\S+,\s*".*?/data/local/su"'
+          - 'const-string\s+\S+,\s*".*?/data/local/xbin/su"'
+        condition: or
 
-    condition: or
+      # Detect simple command execution for root checks
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(.*?"which su".*?\)'
+        condition: or
+
+      # Identify weak root check methods in common root detection classes
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Lcom/.*?/RootDetection;->isDeviceRooted\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Lcom/.*?/SecurityChecks;->detectRoot\(.*?\)'
+        condition: or

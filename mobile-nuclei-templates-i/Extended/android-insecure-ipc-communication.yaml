@@ -1,0 +1,40 @@
+id: android-insecure-ipc-communication
+
+info:
+  name: Insecure ipc communication
+  author: mohammad
+  severity: high
+  description: Detects insecure inter-process communication (IPC) mechanisms, including exported activities, services, content providers, and broadcast receivers without permission protection.
+  tags: android, security, ipc, exported, smali, manifest
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      # Detect exported Activities, Services, and Providers without permission
+      - type: regex
+        regex:
+          - '<activity\s+[^>]*android:exported="true"'
+          - '<service\s+[^>]*android:exported="true"'
+          - '<provider\s+[^>]*android:exported="true"'
+        condition: or
+
+      # Ensure no permission is set for protection
+      - type: regex
+        regex:
+          - '<activity[^>]+android:permission='
+          - '<service[^>]+android:permission='
+          - '<provider[^>]+android:permission='
+        negative: true
+        condition: and
+        part: group(0)
+
+  - extensions:
+      - smali
+    matchers:
+      # Detect insecure Binder transactions without permission checks
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/Parcel;->writeInterfaceToken\(Ljava/lang/String;\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/os/IBinder;->transact\(I.*?\)'
+        condition: or

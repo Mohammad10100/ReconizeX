@@ -1,39 +1,41 @@
-id: android-unused-permissions
+id: android-improper-input-validation
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Improper Input Validation (CWE-020)
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: high
+  description: |
+    Detects improper input validation in Android applications, which can lead to security vulnerabilities like SQL Injection, Command Injection, and Intent Manipulation.
+  reference:
+    - https://cwe.mitre.org/data/definitions/20.html
+  tags: android, security, input-validation, cwe-020
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
+      - java
     matchers:
-      # Match API calls that require specific permissions
+      # Detects direct use of user input without validation
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'getIntent\(\).*?getStringExtra\(' # Extracting input from Intent
+          - 'getExtras\(\).*?get\(' # Extracting unvalidated extras
+          - 'getSharedPreferences\(\).*?getString\(' # Unvalidated input from SharedPreferences
+        condition: or
 
-    condition: or
+      # Detects lack of proper input filtering before execution
+      - type: regex
+        regex:
+          - 'exec\(.*?\)' # Direct execution (potential command injection)
+          - 'Runtime.getRuntime\(\).*?exec\(' # Unvalidated input to exec()
+          - 'ProcessBuilder\(.*?\)' # Unvalidated input to ProcessBuilder
+          - 'openDatabase\(.*?\)' # Potential SQL Injection
+        condition: or
+
+      # Detects missing or improper validation functions
+      - type: regex
+        regex:
+          - 'Pattern.compile\(".*?"\)' # Hardcoded regex patterns
+          - 'Matcher.matches\(' # Usage of regex matching but needs verification
+        negative: true # Ensuring input is actually validated before execution
+        condition: or

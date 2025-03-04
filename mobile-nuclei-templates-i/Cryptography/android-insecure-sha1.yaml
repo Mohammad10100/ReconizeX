@@ -3,7 +3,7 @@ id: android-insecure-sha1
 info:
   name: Android Insecure SHA-1 Hash Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure SHA-1 hashing algorithm in Smali bytecode, which is vulnerable to collision attacks.
     SHA-1 is not collision-resistant and should not be used for cryptographic signatures or secure hashing.

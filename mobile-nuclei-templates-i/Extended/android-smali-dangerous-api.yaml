@@ -1,0 +1,34 @@
+id: android-smali-dangerous-api
+info:
+  name: Android Dangerous & Deprecated API Usage Detection
+  author: mohammad
+  severity: high
+  description: Identifies the usage of potentially dangerous or deprecated APIs in Smali code that may introduce security vulnerabilities.
+  tags: android, security, smali, deprecated-api, dangerous-api
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      # Detect Dangerous APIs
+      - type: regex
+        regex:
+          - 'Landroid/content/Context;->checkCallingOrSelfPermission\(Ljava/lang/String;\)I'  # Can lead to permission abuse
+          - 'Landroid/webkit/WebView;->addJavascriptInterface\(Ljava/lang/Object;Ljava/lang/String;\)'  # JavaScript injection risk
+          - 'Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;\)'  # SQL injection risk
+          - 'Ldalvik/system/DexClassLoader;-><init>\(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;\)'  # Dynamic code execution risk
+          - 'Landroid/app/ActivityManager;->getRunningTasks\(I\)'  # Deprecated in API 21+
+          - 'Landroid/telephony/SmsManager;->sendTextMessage\(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/app/PendingIntent;Landroid/app/PendingIntent;\)'  # SMS abuse
+
+        condition: or
+
+      # Detect Deprecated APIs
+      - type: regex
+        regex:
+          - 'Landroid/telephony/TelephonyManager;->getDeviceId\(\)'  # Deprecated in API 26+
+          - 'Landroid/telephony/TelephonyManager;->getSubscriberId\(\)'  # Deprecated in API 26+
+          - 'Landroid/provider/Settings\$Secure;->getString\(Landroid/content/ContentResolver;Ljava/lang/String;\)'  # Deprecated in API 30+
+          - 'Landroid/net/wifi/WifiInfo;->getMacAddress\(\)'  # Deprecated in API 23+
+          - 'Landroid/app/Notification;->setLatestEventInfo\(Landroid/content/Context;Ljava/lang/CharSequence;Ljava/lang/CharSequence;Landroid/app/PendingIntent;\)'  # Deprecated in API 23+
+
+        condition: or

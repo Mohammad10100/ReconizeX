@@ -3,7 +3,7 @@ id: android-insecure-rc2
 info:
   name: Android Insecure RC2 Cipher Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure RC2 cipher in Smali bytecode, which is considered weak and vulnerable to cryptographic attacks.
     RC2 encryption lacks modern security features and should be replaced with AES for better security.

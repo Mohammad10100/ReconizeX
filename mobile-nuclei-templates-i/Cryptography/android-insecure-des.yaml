@@ -3,7 +3,7 @@ id: android-insecure-des
 info:
   name: Android Insecure DES Cipher Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the DES cipher in Smali bytecode, which is considered weak due to its small key size (56-bit) and vulnerability to brute-force attacks.
     Applications should replace DES with AES for better security.

@@ -3,7 +3,7 @@ id: android-insecure-sha224
 info:
   name: Android Insecure SHA-224 Hash Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the SHA-224 hashing algorithm in Smali bytecode, which is not widely recommended for cryptographic security.
     It is advisable to replace SHA-224 with stronger alternatives like SHA-256 or SHA-3.

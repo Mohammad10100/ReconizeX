@@ -1,39 +1,38 @@
-id: android-unused-permissions
+id: android-missing-jwt-signature-check
 
 info:
-  name: Android Unused Permissions Detection
+  name: Missing JWT Signature Verification
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: high
+  description: |
+    Detects missing or improper JWT signature verification in Android applications.
+    Skipping JWT signature validation allows attackers to forge tokens and bypass authentication.
+  tags: android, security, jwt, authentication, token, cwe-347
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
+      - java
     matchers:
-      # Match API calls that require specific permissions
+      # Detects usage of JWT decoding without signature verification
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'Lcom/auth0/jwt/JWT;->decode\(Ljava/lang/String;\)Lcom/auth0/jwt/JWT;'  # Decoding JWT without verification
+          - 'Lcom/nimbusds/jwt/SignedJWT;->parse\(Ljava/lang/String;\)'  # Parsing JWT but not verifying
+        condition: or
 
-    condition: or
+      # Detects insecure JWT libraries usage (e.g., allowing unsigned tokens)
+      - type: regex
+        regex:
+          - 'Lcom/auth0/jwt/JWTVerifier;->verify\(.*?\)'  # Proper verification
+        negative: true  # Ensures that verification is missing
+
+      # Detects hardcoded secret keys (can lead to key disclosure attacks)
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".{16,}"'  # Detects hardcoded secrets in JWT
+
+      # Detects explicitly allowing "none" algorithm (which disables signature verification)
+      - type: regex
+        regex:
+          - '"alg"\s*:\s*"none"'

@@ -1,0 +1,16 @@
+id: android-hardcoded-ip
+
+info:
+  author: mohammad
+  severity: medium
+  name: Android Hardcoded Cryptographic Keys Detection - Strict
+  description: Detects hardcoded IP addresses in Smali code, which can indicate insecure network configurations or potential backdoors.
+  tags: android, security, network, smali, ip
+
+file:
+  - extensions:
+      - smali
+    matchers:
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"'  

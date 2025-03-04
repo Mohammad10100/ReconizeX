@@ -1,39 +1,32 @@
-id: android-unused-permissions
+id: android-smali-exposed-jni
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Exposed JNI Function Detection
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: medium
+  description: Detects exposed JNI functions in Smali code, including native method declarations and dynamic native library loading.
+  tags: android, security, smali, jni, native
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
     matchers:
-      # Match API calls that require specific permissions
+      # Detect native method declarations
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - '\.method.*native.*\)'  
+        condition: or
 
-    condition: or
+      # Detect dynamic loading of native libraries
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/System;->loadLibrary\(Ljava/lang/String;\)V'
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/System;->load\(Ljava/lang/String;\)V'
+        condition: or
+
+      # Detect usage of RegisterNatives (used to register JNI methods dynamically)
+      - type: regex
+        regex:
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/reflect/Method;->invoke\(.*?\)'  
+          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/Runtime;->getRuntime\(\)Ljava/lang/Runtime;'
+        condition: or

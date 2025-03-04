@@ -1,39 +1,42 @@
-id: android-unused-permissions
+id: android-weak-emulator-detection
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Weak Emulator Detection Mechanisms
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: medium
+  description: Identifies weak or bypassable emulator detection mechanisms in Android applications, such as simple device property checks that can be easily spoofed.
+  tags: android, security, emulator-detection, smali
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
     matchers:
-      # Match API calls that require specific permissions
+      # Detect hardcoded emulator property checks
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'const-string\s+\S+,\s*".*?ro\.kernel\.qemu"'
+          - 'const-string\s+\S+,\s*".*?ro\.product\.model"'
+          - 'const-string\s+\S+,\s*".*?ro\.product\.manufacturer"'
+          - 'const-string\s+\S+,\s*".*?ro\.product\.brand"'
+          - 'const-string\s+\S+,\s*".*?ro\.product\.device"'
+          - 'const-string\s+\S+,\s*".*?ro\.hardware"'
+          - 'const-string\s+\S+,\s*".*?ro\.bootloader"'
+        condition: or
 
-    condition: or
+      # Detect checks for default emulator values
+      - type: regex
+        regex:
+          - 'const-string\s+\S+,\s*".*?generic"'
+          - 'const-string\s+\S+,\s*".*?goldfish"'
+          - 'const-string\s+\S+,\s*".*?ranchu"'
+          - 'const-string\s+\S+,\s*".*?google_sdk"'
+          - 'const-string\s+\S+,\s*".*?sdk"'
+          - 'const-string\s+\S+,\s*".*?Emulator"'
+        condition: or
+
+      # Identify weak emulator detection methods in known security classes
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Lcom/.*?/EmulatorDetection;->isEmulator\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Lcom/.*?/SecurityChecks;->detectEmulator\(.*?\)'
+        condition: or

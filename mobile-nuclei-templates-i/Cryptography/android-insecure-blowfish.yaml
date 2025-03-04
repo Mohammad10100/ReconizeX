@@ -3,7 +3,7 @@ id: android-insecure-blowfish
 info:
   name: Android Insecure Blowfish Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure Blowfish cipher in Android applications.
     Blowfish is considered outdated and should be replaced with AES for stronger security.

@@ -3,7 +3,7 @@ id: android-insecure-ecb
 info:
   name: Android Insecure ECB Cipher Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the ECB (Electronic Codebook) cipher mode in Smali bytecode, which is insecure due to its lack of diffusion.
     ECB encryption results in identical ciphertext blocks for identical plaintext blocks, making it vulnerable to pattern analysis.

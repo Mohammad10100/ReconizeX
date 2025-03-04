@@ -1,39 +1,30 @@
-id: android-unused-permissions
+id: android-potential-dos
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Potential DoS Vulnerability Detection
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: high
+  description: Identifies potential Denial of Service (DoS) vulnerabilities in Android applications, including infinite loops, excessive resource usage, and unthrottled wake locks.
+  tags: android, security, dos, smali, loop
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
     matchers:
-      # Match API calls that require specific permissions
+      # Detect infinite loops (while(true) or for(;))
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'goto :\S+\s+:.*\s+goto :\S+'
+        condition: and
 
-    condition: or
+      # Detect unthrottled wake locks (can drain battery and cause DoS)
+      - type: regex
+        regex:
+          - 'Landroid/os/PowerManager\$WakeLock;->acquire\(.*?\)'
+        condition: and
+
+      # Identify excessive thread creation (can lead to resource exhaustion)
+      - type: regex
+        regex:
+          - 'new-instance\s+\S+,\s+Ljava/lang/Thread;'
+        condition: and

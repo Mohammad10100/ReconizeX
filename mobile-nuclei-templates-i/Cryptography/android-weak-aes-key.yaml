@@ -1,32 +1,29 @@
-id: android-insecure-3des
+id: android-weak-aes-key
 
 info:
-  name: Android Insecure 3DES Usage
+  name: Android Weak AES Key Usage
   author: mohammad
-  severity: high
+  severity: low
   description: |
-    Detects the use of the insecure Triple DES (3DES) cipher, which is vulnerable to attacks like Sweet32.
-    Applications should replace 3DES with AES for better security.
-  tags: android, security, crypto, encryption
+    Detects AES encryption usage with a key size less than 256 bits.
+    NIST recommends using AES-256 for strong security.
+  tags: android, security, cryptography, aes, smali
 
 file:
   - extensions:
       - smali
-      - java
+    matchers-condition: and
     matchers:
-      # Detect usage of 3DES in Cipher.getInstance
+      # Detect AES Cipher usage
       - type: regex
         regex:
-          - 'Cipher\.getInstance\(".*?(3DES|DESede|DESEDEWRAP).*?"'
-      
-      # Detect usage of 3DES in SecretKeyFactory
-      - type: regex
-        regex:
-          - 'SecretKeyFactory\.getInstance\(".*?(DESede).*?"'
+          - 'const-string\s+v\d+,\s*"AES"'
+          - 'invoke-static\s+\{.*?\},\s+Ljavax/crypto/Cipher;->getInstance\(Ljava/lang/String;\)Ljavax/crypto/Cipher;'
+        condition: and
 
-      # Detect potential variable assignments with 3DES
+      # Detect key length usage below 256 bits (e.g., 128-bit or 192-bit)
       - type: regex
         regex:
-          - '\bCipher\s+\w+\s*=\s*Cipher\.getInstance\(".*?(3DES|DESede|DESEDEWRAP).*?"'
-          - '\bSecretKeyFactory\s+\w+\s*=\s*SecretKeyFactory\.getInstance\(".*?(DESede).*?"'
-        condition: or
+          - 'const/16\s+v\d+,\s*128'
+          - 'const/16\s+v\d+,\s*192'
+        condition: or  # If AES is used with 128-bit or 192-bit, trigger an alert

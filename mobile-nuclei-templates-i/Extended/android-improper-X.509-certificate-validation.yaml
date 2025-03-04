@@ -1,9 +1,9 @@
-id: android-improper-X.509-certificate-validation
+id: android-improper-X509-certificate-validation
 
 info:
   name: Android Improper X.509 Certificate Validation
   author: mohammad
-  severity: critical
+  severity: low
   description: |
     Detects improper X.509 certificate validation methods in Android applications, which can lead to MITM attacks.
     Common issues include allowing all certificates, ignoring SSL warnings, and overriding default trust managers.

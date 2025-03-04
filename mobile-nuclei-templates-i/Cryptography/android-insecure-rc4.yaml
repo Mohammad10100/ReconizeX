@@ -3,7 +3,7 @@ id: android-insecure-rc4
 info:
   name: Android Insecure RC4 Cipher Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure RC4 (ARCFOUR) cipher in Smali bytecode, which is vulnerable to cryptographic attacks.
     RC4 has known weaknesses, including biases and susceptibility to plaintext recovery attacks.

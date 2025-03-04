@@ -1,39 +1,27 @@
-id: android-unused-permissions
+id: android-open-redirect
 
 info:
-  name: Android Unused Permissions Detection
+  name: Android Open Redirect Detection
   author: mohammad
-  severity: low
-  description: Detects declared permissions in AndroidManifest.xml that are not used in the application code.
-  tags: android, security, manifest, permissions, smali
+  severity: high
+  description: |
+    Detects improper usage of startActivity(Intent) where external input is used without validation, leading to potential Open Redirect vulnerabilities (CWE-601).
+  tags: android, security, open-redirect, smali, cwe-601
 
 file:
   - extensions:
-      - xml
-    matchers:
-      # Match declared permissions in AndroidManifest.xml
-      - type: regex
-        regex:
-          - '<uses-permission android:name="(.*?)"'
-        extractors:
-          - type: regex
-            regex:
-              - '<uses-permission android:name="(.*?)"'
-
-  - extensions:
       - smali
+      - java
     matchers:
-      # Match API calls that require specific permissions
+      # Detects direct usage of startActivity() with dynamic Intent sources
       - type: regex
         regex:
-          - 'Landroid/location/LocationManager;->getLastKnownLocation'
-          - 'Landroid/telephony/SmsManager;->sendTextMessage'
-          - 'Landroid/hardware/Camera;->open'
-          - 'Landroid/net/wifi/WifiManager;->getScanResults'
-          - 'Landroid/accounts/AccountManager;->getAccounts'
-        extractors:
-          - type: regex
-            regex:
-              - 'Landroid/.*?;->(.*?)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Landroid/app/Activity;->startActivity\(Landroid/content/Intent;\)'
 
-    condition: or
+      # Detects external input sources that may control the Intent
+      - type: regex
+        regex:
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Landroid/content/Intent;->getData\(.*?\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Landroid/net/Uri;->getQueryParameter\(.*?\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Landroid/content/Intent;->getStringExtra\(.*?\)'
+        condition: and
