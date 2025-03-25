@@ -177,5 +177,5 @@ You can combine -o and -je to get both text and JSON outputs.
  
 
 # 📷 Screenshots
-![screenshot](https://github.com/user-attachments/assets/3a4903ec-61b6-479a-8da5-273220bfeeab)
+![screenshot](https://github.com/user-attachments/assets/ec89f00c-4e8e-46b2-a101-7e3b3ebad069)
 
