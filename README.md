@@ -10,9 +10,11 @@ This App is inspired from [apknuke](https://github.com/utkarsh24122/apknuke)
 
 
 # ⚙ Setup
+
+1. Clone the repository and navigate into the directory:
 ```
-$ git clone https://github.com/mohammad10100/ReconizeX
-$ cd ReconizeX
+$ git clone https://github.com/Shreyas-Penkar/Open-Android-Analysis.git
+$ cd Mohammad/ReconizeX
 $ chmod +x reconizex.py
 ```
 install apktool ([Read How](https://ibotpeaches.github.io/Apktool/install/))
@@ -30,21 +32,29 @@ PATH_TO_NucleiTemplates="/[path]/mobile-nuclei-templates-i/"
 ## Intense Mode
 ```
 python3 reconizex.py <target.apk>
-
-1
-
+# Example:
+python3 reconizex.py app.apk
 ```
-
 
 ## Restricted Mode
 ```
-python3 reconizex.py <target.apk>
-
-2
-
-<your.package.name> (e.g. com.example.app)
-
+python3 reconizex.py <target.apk> -r <your.package.name>
+# Example:
+python3 reconizex.py app.apk -r com.example.app
 ```
+
+## Exporting a json file for API integration
+```
+python3 reconizex.py <target.apk> -o output.txt -je results.json
+```
+
+## Flags
+-o <output_file> → Defines the output file name.
+-je <json_file> → Exports the results in JSON format.
+-r <package_name> → Enables restricted mode for a specific package.
+You can combine -o and -je to get both text and JSON outputs.
+
+
 # Features ✨
 
 - Checks for :
