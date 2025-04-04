@@ -15,8 +15,8 @@ This App is inspired from [apknuke](https://github.com/utkarsh24122/apknuke)
 
 1. Clone the repository and navigate into the directory:
 ```
-$ git clone https://github.com/Shreyas-Penkar/Open-Android-Analysis.git
-$ cd Mohammad/ReconizeX
+$ git clone https://github.com/Mohammad10100/ReconizeX.git
+$ cd ReconizeX
 $ chmod +x reconizex.py
 ```
 2. install dependencies:
