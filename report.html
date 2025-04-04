@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconizex Scan Report</title>
+    <link rel="icon" type="image/x-icon" href="images/faviconblood.ico">
+    <style>
+        body {
+            font-family: "Courier New", monospace;
+            background: black;
+            color: #00ff00;
+            text-align: center;
+            margin: 20px;
+        }
+        #wave {
+            width: 100%;
+            height: 10rem;
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+            /* opacity: 0.75; */
+        }
+        h1 {
+            text-shadow: 0 0 5px #00ff00;
+            margin: 5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 10px #00ff00;
+            color: #00ff00;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #00ff00;
+            text-align: left;
+        }
+        th {
+            background: #003300;
+            cursor: pointer;
+        }
+        tr:nth-child(even) {
+            background: rgba(0, 255, 0, 0.1);
+        }
+        .low { background-color: #006600; color: #00ff00; }
+        .medium { background-color: #b3b300; color: black; }
+        .high { background-color: #990000; color: white; }
+        .critical { background-color: #ff0000; color: white; text-shadow: 0 0 5px white; }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            10% { opacity: 0.7; }
+            20% { opacity: 0.3; }
+            40% { opacity: 0.9; }
+            50% { opacity: 0.4; }
+            60% { opacity: 1; }
+            80% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .flicker {
+            animation: flicker 1.5s infinite alternate;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="images/wavefinal.png" id="wave" class="flicker">
+    <h1 class="flicker">[ Reconizex Scan Report ]</h1>
+
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th onclick="sortTableByTemplate()">Template &#x25B2;&#x25BC;</th>
+                <th onclick="toggleSeveritySort()">Severity &#x25B2;&#x25BC;</th>
+                <th onclick="toggleUrlSort()">Matched URL &#x25B2;&#x25BC;</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const severityOrder = { "critical": 4, "high": 3, "medium": 2, "low": 1, "unknown": 0 };
+        let originalData = [];
+        let sortDirection = {
+            severity: 'desc',
+            url: 'asc',
+            template: 'asc'
+        };
+
+        function getSeverityClass(severity) {
+            switch (severity.toLowerCase()) {
+                case "low": return "low";
+                case "medium": return "medium";
+                case "high": return "high";
+                case "critical": return "critical";
+                default: return "";
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector("#resultsTable tbody");
+            tbody.innerHTML = "";
+
+            data.forEach(result => {
+                const row = document.createElement("tr");
+                const cell1 = document.createElement("td");
+                const cell2 = document.createElement("td");
+                const cell3 = document.createElement("td");
+
+                const severity = result.info?.severity?.toLowerCase() || "unknown";
+
+                cell1.textContent = result["template-id"] || result.template;
+                cell2.textContent = severity;
+                cell2.classList.add(getSeverityClass(severity));
+                cell3.textContent = result.host || result["matched-at"] || "N/A";
+
+                row.appendChild(cell1);
+                row.appendChild(cell2);
+                row.appendChild(cell3);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function toggleSeveritySort() {
+            sortDirection.severity = sortDirection.severity === 'asc' ? 'desc' : 'asc';
+            const sorted = [...originalData].sort((a, b) => {
+                const sevA = a.info?.severity?.toLowerCase() || "unknown";
+                const sevB = b.info?.severity?.toLowerCase() || "unknown";
+                return sortDirection.severity === 'asc' ? severityOrder[sevA] - severityOrder[sevB] : severityOrder[sevB] - severityOrder[sevA];
+            });
+            renderTable(sorted);
+        }
+
+        function toggleUrlSort() {
+            sortDirection.url = sortDirection.url === 'asc' ? 'desc' : 'asc';
+            const sorted = [...originalData].sort((a, b) => {
+                const urlA = a.host || a["matched-at"] || "";
+                const urlB = b.host || b["matched-at"] || "";
+                return sortDirection.url === 'asc' ? urlA.localeCompare(urlB) : urlB.localeCompare(urlA);
+            });
+            renderTable(sorted);
+        }
+
+        function sortTableByTemplate() {
+            sortDirection.template = sortDirection.template === 'asc' ? 'desc' : 'asc';
+            const sorted = [...originalData].sort((a, b) => {
+                const tA = a["template-id"] || a.template || "";
+                const tB = b["template-id"] || b.template || "";
+                return sortDirection.template === 'asc' ? tA.localeCompare(tB) : tB.localeCompare(tA);
+            });
+            renderTable(sorted);
+        }
+
+        fetch("report.json")
+            .then(response => response.json())
+            .then(data => {
+                originalData = data;
+                renderTable(data);
+            })
+            .catch(error => console.error("Error loading JSON:", error));
+    </script>
+
+</body>
+</html>

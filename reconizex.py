@@ -2,7 +2,14 @@ import argparse
 import subprocess
 import os
 import sys
-import shutil
+import threading
+import webbrowser
+import http.server
+import socketserver
+import socket
+import signal
+
+PORT = 4309
 
 def print_banner():
     banner = """
@@ -84,7 +91,40 @@ def run_nuclei(decompile_dir, templates_path, output_file, json_export, smali_di
     nuclei_cmd = f"echo {scan_target} | nuclei --silent -file -t {templates_path} -o {output_file}"
     if json_export:
         nuclei_cmd += f" -je {json_export}"
+    nuclei_cmd += f" --json-export report.json"
     run_command(nuclei_cmd)
+
+
+def kill_process_on_port(port):
+    """Kill any process using the specified port."""
+    try:
+        result = subprocess.run(
+            f"lsof -ti:{port}", shell=True, capture_output=True, text=True
+        )
+        pids = result.stdout.strip().split("\n")
+        for pid in pids:
+            if pid:
+                os.kill(int(pid), signal.SIGKILL)
+                print(f"Killed process {pid} using port {port}")
+    except Exception as e:
+        print(f"Failed to kill process on port {port}: {e}")
+
+def is_port_in_use(port):
+    """Check if the port is already in use."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("localhost", port)) == 0
+
+
+def start_server():
+    """Start an HTTP server using subprocess."""
+    kill_process_on_port(PORT)
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+    try:
+        subprocess.run(["python3", "-m", "http.server", str(PORT)], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to start server: {e}")
+
 
 def main():
     print_banner()
@@ -107,6 +147,14 @@ def main():
     print_status(f"Scan complete. Results saved in {resolve_output_path(args.output, '.txt')}","+")
     if args.json_export:
         print_status(f"JSON results saved in {resolve_output_path(args.json_export, '.json')}","+")
+    
+     # Start server in a separate thread
+    server_thread = threading.Thread(target=start_server, daemon=True)
+    server_thread.start()
+
+    # Wait for server to start, then open browser
+    webbrowser.open(f"http://localhost:{PORT}/report.html")
+
 
 if __name__ == "__main__":
     main()
