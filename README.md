@@ -49,10 +49,12 @@ python3 reconizex.py <target.apk> -o output.txt -je results.json
 ```
 
 ## Flags
--o <output_file> → Defines the output file name.
--je <json_file> → Exports the results in JSON format.
--r <package_name> → Enables restricted mode for a specific package.
-You can combine -o and -je to get both text and JSON outputs.
+
+- `-o <output_file>` → Defines the output file name.
+- `-je <json_file>` → Exports the results in JSON format.
+- `-r <package_name>` → Enables restricted mode for a specific package.
+
+You can combine `-o` and `-je` to get both text and JSON outputs.
 
 
 # Features ✨
@@ -177,5 +179,5 @@ You can combine -o and -je to get both text and JSON outputs.
  
 
 # 📷 Screenshots
-![screenshot](https://github.com/user-attachments/assets/3a4903ec-61b6-479a-8da5-273220bfeeab)
+![screenshot](https://github.com/user-attachments/assets/ec89f00c-4e8e-46b2-a101-7e3b3ebad069)
 
