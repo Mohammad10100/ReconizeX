@@ -1,7 +1,9 @@
-# ReconizeX ## – Unveiling Hidden Vulnerabilities in Android Apps
+# ReconizeX ⚔️ – Unveiling Hidden Vulnerabilities in Android Apps
 ### For Static Analysis 🎯
 
 Template Based Static Analysis of Android Applications 
+
+A powerful tool for statically analyzing Android applications and detecting sensitive information, insecure coding patterns, and misconfigurations using Nuclei templates.
 
 Find secrets, keys, weak coding practices & many more. Check [Features](https://github.com/utkarsh24122/apknuke#features-) & [Screenshots](https://github.com/mohammad10100/ReconizeX#-screenshots)
 
@@ -17,13 +19,14 @@ $ git clone https://github.com/Shreyas-Penkar/Open-Android-Analysis.git
 $ cd Mohammad/ReconizeX
 $ chmod +x reconizex.py
 ```
+2. install dependencies:
 install apktool ([Read How](https://ibotpeaches.github.io/Apktool/install/))
 required: [python](https://www.python.org/downloads/)
 required: [nuclei](https://github.com/projectdiscovery/nuclei)
 
-you can use the already existing templates | create your own | or can use the originals from [optive](https://github.com/optiv/mobile-nuclei-templates)
-be sure to change the path if you use any other template
-
+3. Templates:
+Use the included templates, your custom ones, or official ones from [optive](https://github.com/optiv/mobile-nuclei-templates). Update the template path in the script if needed:
+Update the template path in the script if needed:
 ```
 PATH_TO_NucleiTemplates="/[path]/mobile-nuclei-templates-i/"
 ```
@@ -48,11 +51,21 @@ python3 reconizex.py app.apk -r com.example.app
 python3 reconizex.py <target.apk> -o output.txt -je results.json
 ```
 
-## Flags
+## 🛠️ Command Line Help
+```
+usage: reconizex.py [-h] [-r PACKAGE] [-o OUTPUT] [-je JSONEXPORT] apk
 
-- `-o <output_file>` → Defines the output file name.
-- `-je <json_file>` → Exports the results in JSON format.
-- `-r <package_name>` → Enables restricted mode for a specific package.
+ReconizeX - Android APK Vulnerability Scanner
+
+positional arguments:
+  apk                   Path to target APK file
+
+optional arguments:
+  -h, --help            Show this help message and exit
+  -r, --restrict        Package name for restricted scan mode
+  -o, --output          Output file name for text report
+  -je, --jsonexport     Export scan results in JSON format
+  ```
 
 You can combine `-o` and `-je` to get both text and JSON outputs.
 
@@ -176,8 +189,19 @@ You can combine `-o` and `-je` to get both text and JSON outputs.
  SSL Misconfiguration
  
  Tapjacking  
+
+
+# 📈 HTML Reporting (New!)
+
+A fully styled, interactive HTML report (report.html) is auto-generated when used with JSON export.
+Features:
+
+    Sort by severity, template ID, or URL
+
+    Hacker-style themed UI with green flicker animation
+
+    No external dependencies — 100% client-side
  
 
 # 📷 Screenshots
 ![screenshot](https://github.com/user-attachments/assets/ec89f00c-4e8e-46b2-a101-7e3b3ebad069)
-
