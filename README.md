@@ -205,3 +205,4 @@ Features:
 
 # 📷 Screenshots
 ![screenshot](https://github.com/user-attachments/assets/ec89f00c-4e8e-46b2-a101-7e3b3ebad069)
+![screenshotui](https://github.com/user-attachments/assets/d8f666b8-1808-4487-b4e0-0132f1611bfd)
