@@ -5,6 +5,7 @@ mobile-nuclei-templates-i/.DS_Store
 /input/*
 # But keep the input folder itself
 !/input/
+!/input/*.txt
 
 # Ignore everything in output/
 /output/*
