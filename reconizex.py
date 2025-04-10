@@ -4,12 +4,14 @@ import os
 import sys
 import threading
 import webbrowser
-import http.server
-import socketserver
 import socket
 import signal
+import shutil
 
 PORT = 4309
+INPUT_DIR = "./input"
+OUTPUT_DIR = "./output"
+PATH_TO_NUCLEI_TEMPLATES = "./mobile-nuclei-templates-i"
 
 def print_banner():
     banner = """
@@ -70,28 +72,27 @@ def restricted_scan(decompile_dir, package_name):
     return existing_dirs
 
 def resolve_output_path(output_path, default_ext):
-    """Ensure the output path has a proper extension and is correctly placed one directory back"""
+    """Ensure the output path has a proper extension and is inside the ./output folder by default"""
     if not os.path.isabs(output_path):
-        parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        output_path = os.path.join(parent_dir, output_path)
-    
+        output_path = os.path.join(OUTPUT_DIR, output_path)
+
     if not os.path.splitext(output_path)[1]:  # If no extension provided, append default
         output_path += default_ext
-    
-    return output_path
+
+    return os.path.abspath(output_path)
+
 
 def run_nuclei(decompile_dir, templates_path, output_file, json_export, smali_dirs=None):
     print_status("Running Nuclei Templates...", "*")
     scan_target = decompile_dir if not smali_dirs else ' '.join(smali_dirs)
     
-    output_file = resolve_output_path(output_file, ".txt")
-    if json_export:
-        json_export = resolve_output_path(json_export, ".json")
-    
-    nuclei_cmd = f"echo {scan_target} | nuclei --silent -file -t {templates_path} -o {output_file}"
-    if json_export:
-        nuclei_cmd += f" -je {json_export}"
-    nuclei_cmd += f" --json-export report.json"
+    output_file = resolve_output_path(output_file if output_file != "output.txt" else "report.txt", ".txt")
+    json_export = resolve_output_path(json_export if json_export else "report.json", ".json")
+
+    nuclei_cmd = f"echo {scan_target} | nuclei --silent -file -t {templates_path}"
+    nuclei_cmd += f" -o \"{output_file}\""
+    nuclei_cmd += f" -je \"{json_export}\""
+
     run_command(nuclei_cmd)
 
 
@@ -129,13 +130,26 @@ def start_server():
 def main():
     print_banner()
     parser = argparse.ArgumentParser(usage="python3 reconizex0.py [-h] [-r RESTRICTED] [-o OUTPUT] [-je JSON_EXPORT] apk", description="APK Vulnerability Scanner using Nuclei")
-    parser.add_argument("apk", help="Path to the target APK file")
+    parser.add_argument("apk", nargs="?", help="Path to the target APK file (optional if placed in ./input/)")
     parser.add_argument("-r", "--restricted", help="Restricted mode with package name (e.g., com.example.app)")
     parser.add_argument("-o", "--output", default="output.txt", help="Path to the txt output file")
     parser.add_argument("-je", "--json-export", help="Path to export results in JSON format")
     args = parser.parse_args()
     
-    PATH_TO_NUCLEI_TEMPLATES = "./mobile-nuclei-templates-i/"
+    
+    if not args.apk:
+        apk_files = [f for f in os.listdir(INPUT_DIR) if f.endswith(".apk")]
+        if not apk_files:
+            print_status(f"No APK files found in {INPUT_DIR}.", "-")
+            sys.exit(1)
+        args.apk = os.path.join(INPUT_DIR, apk_files[0])
+        print_status(f"Auto-detected APK: {args.apk}", "*")
+
+    # prevents FileNotFoundError
+    if not os.path.exists(args.apk):
+        print_status(f"APK file '{args.apk}' not found. Please check the path.", "-")
+        sys.exit(1)
+
     decompiled_folder = decompile_apk(args.apk)
     
     if args.restricted:
@@ -147,14 +161,27 @@ def main():
     print_status(f"Scan complete. Results saved in {resolve_output_path(args.output, '.txt')}","+")
     if args.json_export:
         print_status(f"JSON results saved in {resolve_output_path(args.json_export, '.json')}","+")
+        # After saving your JSON report at user-specified path
+        json_output_path = resolve_output_path(args.json_export, '.json')
+        # Also copy it to a fixed location for HTML use
+        fixed_json_path = os.path.join(OUTPUT_DIR, "report.json")
+        try:
+            shutil.copy(json_output_path, fixed_json_path)
+            print_status(f"Copied JSON to {fixed_json_path} for HTML viewer", "+")
+        except Exception as e:
+            print_status(f"Error copying JSON for HTML: {e}", "!")
     
      # Start server in a separate thread
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
 
     # Wait for server to start, then open browser
-    webbrowser.open(f"http://localhost:{PORT}/report.html")
+    webbrowser.open(f"http://localhost:{PORT}/output/report.html")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print_status(f"Unexpected error: {e}", "-")
+        sys.exit(1)

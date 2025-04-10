@@ -1,1 +1,14 @@
 report.json
+.DS_Store
+mobile-nuclei-templates-i/.DS_Store
+# Ignore everything in input/ folder
+/input/*
+# But keep the input folder itself
+!/input/
+
+# Ignore everything in output/
+/output/*
+# But keep these specific files in output/
+!/output/report.json
+!/output/report.txt
+!/output/report.html
