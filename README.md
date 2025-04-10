@@ -39,6 +39,8 @@ python3 reconizex.py <target.apk>
 python3 reconizex.py app.apk
 ```
 
+## ⚠️ It is recommended to use Restricted Mode for better analysis of a single package
+
 ## Restricted Mode
 ```
 python3 reconizex.py <target.apk> -r <your.package.name>
@@ -67,7 +69,9 @@ optional arguments:
   -je, --jsonexport     Export scan results in JSON format
   ```
 
+### 📝 Note: If no APK is provided as a positional argument, the tool will automatically look for the first .apk file inside the ./input/ directory and use it
 You can combine `-o` and `-je` to get both text and JSON outputs.
+
 
 
 # Features ✨
@@ -191,16 +195,21 @@ You can combine `-o` and `-je` to get both text and JSON outputs.
  Tapjacking  
 
 
-# 📈 HTML Reporting (New!)
+# 📈 HTML Reporting (🔥New!)
 
 A fully styled, interactive HTML report (report.html) is auto-generated when used with JSON export.
 Features:
 
-    Sort by severity, template ID, or URL
+    ✅ Sort by severity, template ID, or URL
 
-    Hacker-style themed UI with green flicker animation
+    🧙‍♂️ Hacker-style themed UI with green flicker animation
 
-    No external dependencies — 100% client-side
+    🚀 No external dependencies — 100% client-side
+
+## Just run:
+```
+  python3 reconizex.py app.apk [-r PACKAGE] [-o OUTPUT] [-je JSONEXPORT]
+```
  
 
 # 📷 Screenshots
