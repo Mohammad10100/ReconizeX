@@ -1,0 +1,17 @@
+id: android-exported-implicit-components
+
+info:
+  name: Android Implicitly Exported Components (via Intent Filter)
+  author: mohammad
+  severity: high
+  description: Detects Android components that are implicitly exported by having intent-filters but no `android:exported` attribute.
+  tags: android, manifest, intent-filter, exported
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - '<intent-filter>'
+        condition: or

@@ -23,10 +23,3 @@ file:
           - 'invoke-static\s+\{.*?\},\s+Ljava/lang/System;->loadLibrary\(Ljava/lang/String;\)V'
           - 'invoke-static\s+\{.*?\},\s+Ljava/lang/System;->load\(Ljava/lang/String;\)V'
         condition: or
-
-      # Detect usage of RegisterNatives (used to register JNI methods dynamically)
-      - type: regex
-        regex:
-          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/reflect/Method;->invoke\(.*?\)'  
-          - 'invoke-static\s+\{.*?\},\s+Ljava/lang/Runtime;->getRuntime\(\)Ljava/lang/Runtime;'
-        condition: or

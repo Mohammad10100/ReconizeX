@@ -5,37 +5,47 @@ info:
   author: mohammad
   severity: high
   description: |
-    Detects improper input validation in Android applications, which can lead to security vulnerabilities like SQL Injection, Command Injection, and Intent Manipulation.
+    Detects unvalidated user input in Android code that might lead to SQLi, command injection, etc.
   reference:
     - https://cwe.mitre.org/data/definitions/20.html
   tags: android, security, input-validation, cwe-020
 
 file:
   - extensions:
-      - smali
       - java
+      - smali
     matchers:
-      # Detects direct use of user input without validation
+      # Source 1
       - type: regex
         regex:
-          - 'getIntent\(\).*?getStringExtra\(' # Extracting input from Intent
-          - 'getExtras\(\).*?get\(' # Extracting unvalidated extras
-          - 'getSharedPreferences\(\).*?getString\(' # Unvalidated input from SharedPreferences
-        condition: or
+          - getIntent\(\)\.getStringExtra\(
 
-      # Detects lack of proper input filtering before execution
+      # Source 2
       - type: regex
         regex:
-          - 'exec\(.*?\)' # Direct execution (potential command injection)
-          - 'Runtime.getRuntime\(\).*?exec\(' # Unvalidated input to exec()
-          - 'ProcessBuilder\(.*?\)' # Unvalidated input to ProcessBuilder
-          - 'openDatabase\(.*?\)' # Potential SQL Injection
-        condition: or
+          - getExtras\(\)\.get\(
 
-      # Detects missing or improper validation functions
+      # Source 3
       - type: regex
         regex:
-          - 'Pattern.compile\(".*?"\)' # Hardcoded regex patterns
-          - 'Matcher.matches\(' # Usage of regex matching but needs verification
-        negative: true # Ensuring input is actually validated before execution
-        condition: or
+          - getSharedPreferences\(.*?\)\.getString\(
+
+      # Sink 1
+      - type: regex
+        regex:
+          - exec\(.*?\)
+
+      # Sink 2
+      - type: regex
+        regex:
+          - Runtime\.getRuntime\(\)\.exec\(
+
+      # Sink 3
+      - type: regex
+        regex:
+          - new ProcessBuilder\(
+
+      # Sink 4
+      - type: regex
+        regex:
+          - openDatabase\(.*?\)

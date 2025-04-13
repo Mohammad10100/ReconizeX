@@ -1,4 +1,5 @@
 id: android-smali-os-command-injection-strict
+
 info:
   name: Android Smali OS Command Injection - Strict
   author: mohammad
@@ -13,20 +14,28 @@ file:
       # Detect command execution functions (Runtime.exec or ProcessBuilder)
       - type: regex
         regex:
-          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(Ljava/lang/String;\)'
-          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;-><init>\(.*?\)'
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(Ljava/lang/String;\)'  # Runtime.exec
+          - 'invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;-><init>\(.*?\)'  # ProcessBuilder constructor
         condition: and
 
-      # Detect commands that are dynamically built (ensuring user input influence)
+      # Detect string manipulation functions that build commands (dynamically constructed from user input)
       - type: regex
         regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)'
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->format\(Ljava/lang/String;.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'  # StringBuilder append
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)'  # String concatenation
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->format\(Ljava/lang/String;.*?\)'  # String format
         condition: and
 
-      # Ensure suspicious commands (e.g., shell execution, privilege escalation)
+      # Refined detection of suspicious command strings (like shell commands) passed to exec or ProcessBuilder
       - type: regex
         regex:
-          - 'const-string\s+\S+,\s*".*?(sh|/bin/sh|/system/bin/sh|/system/xbin/su|nc|wget|curl|chmod|chown|rm -rf|cat /proc/self/environ).*?"'
+          - 'const-string\s+\S+,\s*".*?(sh|/bin/sh|/system/bin/sh|/system/xbin/su|nc|wget|curl|chmod|chown|rm -rf|cat /proc/self/environ).*?"\s*\n\s*invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/Runtime;->exec\(Ljava/lang/String;\)'  # Runtime.exec with shell commands
+          - 'const-string\s+\S+,\s*".*?(sh|/bin/sh|/system/bin/sh|/system/xbin/su|nc|wget|curl|chmod|chown|rm -rf|cat /proc/self/environ).*?"\s*\n\s*invoke-(?:virtual|direct)\s+\{.*?\},\s+Ljava/lang/ProcessBuilder;-><init>\(.*?\)'  # ProcessBuilder with shell commands
+        condition: and
+
+      # Detect the use of user input (e.g., EditText, Intent extras) that may influence the command construction
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/widget/EditText;->getText\(\)Ljava/lang/CharSequence;'  # Get user input from EditText
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->getStringExtra\(Ljava/lang/String;\)'  # Get user input from Intent extras
         condition: and

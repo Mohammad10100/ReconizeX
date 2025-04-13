@@ -1,0 +1,24 @@
+id: android-exported-components
+
+info:
+  name: Android Explicit Exported Component Detection
+  author: mohammad
+  severity: medium
+  description: Detects explicitly exported Android components (Activity, Service, Receiver, Provider).
+  tags: android, manifest, exported, component
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - '<activity[^>]*android:exported="true"'
+          - '<service[^>]*android:exported="true"'
+          - '<receiver[^>]*android:exported="true"'
+          - '<provider[^>]*android:exported="true"'
+        condition: or
+    extractors:
+      - type: regex
+        regex:
+          - 'android:name="([^"]+)"'

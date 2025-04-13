@@ -1,0 +1,18 @@
+id: android-debug-certificate
+
+info:
+  name: Application Signed with Debug Certificate
+  author: mohammad
+  severity: high
+  description: >
+    The application is signed with a debug certificate. This indicates the app is not properly signed for release and could be easily re-signed and redistributed by attackers.
+  remediation: >
+    Sign the APK using a production keystore before releasing it.
+
+file:
+  - extensions:
+      - apk
+    matchers:
+      - type: dsl
+        dsl:
+          - 'certificate_subject == "CN=Android Debug,O=Android,C=US"'

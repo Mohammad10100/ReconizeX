@@ -13,3 +13,4 @@ mobile-nuclei-templates-i/.DS_Store
 !/output/report.json
 !/output/report.txt
 !/output/report.html
+*.log

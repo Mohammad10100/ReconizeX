@@ -1,27 +1,25 @@
 id: android-insecure-random
+
 info:
   name: Android Insecure Random Number Generation
   author: mohammad
   severity: medium
-  description: Detects the use of insecure random number generators, which may lead to predictable values.
-  tags: android, security, random, crypto
+  description: Detects the use of insecure random number generators (`java.util.Random` or `Math.random()`), which may lead to predictable values. Promotes the use of `SecureRandom` for cryptographic operations.
+  tags: android, security, random, crypto, smali, predictability
 
 file:
   - extensions:
       - smali
+
     matchers:
-      # Detect java.util.Random instantiation
+      # Detect instantiation of java.util.Random
       - type: regex
         regex:
-          - 'new-instance\s+\S+,\s+Ljava/util/Random;'
-      
-      # Detect Math.random() calls
+          - 'new-instance\s+v\d+,\s+Ljava/util/Random;'
+        condition: and
+
+      # Detect call to Math.random()
       - type: regex
         regex:
           - 'invoke-static\s+\{.*?\},\s+Ljava/lang/Math;->random\(\)D'
-
-      # Exclude SecureRandom (false positives filtering)
-      - type: regex
-        regex:
-          - 'new-instance\s+\S+,\s+Ljava/security/SecureRandom;'
-        negative: true  # Exclude these patterns
+        condition: or

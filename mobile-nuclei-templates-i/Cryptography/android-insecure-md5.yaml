@@ -3,7 +3,7 @@ id: android-insecure-md5
 info:
   name: Android Insecure MD5 Hash Usage
   author: mohammad
-  severity: warning
+  severity: low
   description: |
     Detects the use of the insecure MD5 hashing algorithm in Smali files.
     MD5 is vulnerable to collision attacks and should not be used for cryptographic security.

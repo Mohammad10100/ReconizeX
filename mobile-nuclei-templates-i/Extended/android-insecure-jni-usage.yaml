@@ -1,0 +1,25 @@
+id: android-insecure-jni-usage
+
+info:
+  name: Insecure JNI Usage with User Input
+  author: mohammad
+  severity: high
+  description: |
+    Detects when user input is passed into a JNI method, which could lead to native code vulnerabilities if not properly sanitized.
+  reference:
+    - https://developer.android.com/training/articles/perf-jni
+  remediation: |
+    Sanitize and validate all inputs before passing to JNI.
+    Avoid calling native code directly with user-controlled data.
+  tags: android, jni, smali, native, security
+
+file:
+  - extensions:
+      - smali
+      - java
+    matchers:
+      - type: regex
+        regex:
+          - 'L[^;]+;->initiateLaunchSequence\(Ljava/lang/String;\)I'  # JNI method signature
+          - 'invoke-virtual\s+\{[^}]+\},\s+L[^;]+;->initiateLaunchSequence\(Ljava/lang/String;\)I'  # Smali call
+          - 'Ljakhar/aseem/diva/DivaJni;->initiateLaunchSequence\(Ljava/lang/String;\)I'

@@ -1,0 +1,35 @@
+id: android-apktool-config
+
+info:
+  name: Insecure APK Configuration - apktool.yml
+  author: mohammad
+  severity: low
+  description: Flags insecure SDK versions, shared libraries, or compressed native files in apktool.yml
+  tags: android, apktool, config, sdk
+
+file:
+  - extensions:
+      - yml
+      - yaml
+    matchers:
+      - type: regex
+        name: low-min-sdk
+        regex:
+          - 'minSdkVersion:\s*(1[0-6])'   # Min SDK lower than 17 (can be very insecure)
+
+      - type: regex
+        name: low-target-sdk
+        regex:
+          - 'targetSdkVersion:\s*(1[0-9]|2[0-2])'  # Target SDK < 23 (permissions model weaker)
+
+      - type: regex
+        name: shared-library-enabled
+        regex:
+          - 'sharedLibrary:\s*true'
+
+      - type: regex
+        name: compressed-png
+        regex:
+          - 'doNotCompress:\s*\n\s*-\s*png'
+
+    matchers-condition: or

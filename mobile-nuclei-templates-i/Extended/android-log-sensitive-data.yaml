@@ -1,4 +1,5 @@
 id: android-log-sensitive-data-strict
+
 info:
   name: Android Sensitive Data in Log Files - Strict
   author: mohammad
@@ -10,30 +11,27 @@ file:
   - extensions:
       - smali
       - java
+
     matchers:
-      # Match Android Log methods (e.g., Log.d, Log.e, Log.i, Log.v, Log.w)
+      # Match Log methods: Log.d(), Log.e(), etc.
       - type: regex
         regex:
-          - 'Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'  # Log methods
-          - 'invoke-static\s+\{.*?\},\s+Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'  # Ensure invocation detection
-        condition: and
+          - 'invoke-static\s+\{.*?\},\s+Landroid/util/Log;->[deivw]\(Ljava/lang/String;Ljava/lang/String;\)'
 
-      # Match sensitive data patterns (passwords, API keys, tokens, secrets)
+      # Match logging of sensitive keywords
       - type: regex
         regex:
-          - '(".*?(password|api[_-]?key|token|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?"\s*\+)'
-          - '(".*?([A-Za-z0-9+/]{40,}|[A-Za-z0-9-_]{32,}|[A-Za-z0-9]{20,}).*?"\s*\+)'  # Matches long strings (e.g., tokens, hashes)
-          - '"(?:AKIA|AIza|sk_live|ghp)[A-Za-z0-9]{20,}"'  # AWS, Google, Stripe, GitHub keys
-        condition: and
+          - '"[^"]*(password|token|api[_-]?key|secret|auth|access[_-]?key|private[_-]?key|credentials|session[_-]?id)[^"]*"\s*(\+|\))'
 
-      # Match System.out.println (Java) with sensitive data
+      # Match potential hardcoded keys or secrets being logged
       - type: regex
         regex:
-          - 'System\.out\.println\s*\(.*?(password|api[_-]?key|token|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?\)'
+          - '"(?:AKIA|AIza|sk_live|ghp)[A-Za-z0-9]{20,}"'
+          - '"[A-Za-z0-9+/]{32,}"'  # base64 or long token
         condition: or
 
-      # Exclude common false positives (e.g., generic log messages, debug logs)
+      # Match System.out.println with sensitive data
       - type: regex
         regex:
-          - '(".*?(debug|info|error|warning|verbose|success|start|end|initialized|loaded|status|config|message).*?")'
-        negative: true  # Exclude these patterns
+          - 'System\.out\.println\s*\(.*?(password|token|apikey|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?\)'
+        condition: or

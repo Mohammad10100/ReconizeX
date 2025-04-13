@@ -1,0 +1,25 @@
+id: android-insecure-external-file-storage
+
+info:
+  name: Insecure External File Storage (/storage/emulated/0)
+  author: mohammad
+  severity: critical
+  description: Detects storage of sensitive data in external storage (e.g., /sdcard), which can be accessed by other apps.
+  tags: android, smali, storage, external, insecure-storage, cwe-312
+
+file:
+  - extensions:
+      - smali
+    matchers-condition: and
+    matchers:
+      - type: regex
+        regex:
+          - 'Landroid/os/Environment;->getExternalStorageDirectory\(\)Ljava/io/File;'
+
+      - type: regex
+        regex:
+          - 'new-instance\s+\S+,\s+Ljava/io/FileWriter;'
+
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/FileWriter;->write\(Ljava/lang/String;\)V'

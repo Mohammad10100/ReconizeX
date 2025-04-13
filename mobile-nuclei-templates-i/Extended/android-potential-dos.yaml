@@ -4,27 +4,34 @@ info:
   name: Android Potential DoS Vulnerability Detection
   author: mohammad
   severity: high
-  description: Identifies potential Denial of Service (DoS) vulnerabilities in Android applications, including infinite loops, excessive resource usage, and unthrottled wake locks.
-  tags: android, security, dos, smali, loop
+  description: Identifies potential Denial of Service (DoS) vulnerabilities in Android applications, including infinite loops, unthrottled wake locks, and excessive thread creation.
+  tags: android, security, dos, smali, loop, wakelock, threading
 
 file:
   - extensions:
       - smali
+
     matchers:
-      # Detect infinite loops (while(true) or for(;))
+      # Infinite loop pattern (loop jumping to self or back)
       - type: regex
         regex:
-          - 'goto :\S+\s+:.*\s+goto :\S+'
+          - ':\w+\s+.*\s+goto\s+:\w+\s*#?\s*loop'  # loop labels are often tagged or self-referencing
+        condition: or
+
+      # Unreleased or unthrottled wake lock
+      - type: regex
+        regex:
+          - 'Landroid/os/PowerManager\$WakeLock;->acquire\('
+        condition: and
+      - type: regex
+        regex:
+          - 'Landroid/os/PowerManager\$WakeLock;->release\('
+        negative: true  # ensure release isn't present
         condition: and
 
-      # Detect unthrottled wake locks (can drain battery and cause DoS)
+      # Excessive thread creation (without thread pooling)
       - type: regex
         regex:
-          - 'Landroid/os/PowerManager\$WakeLock;->acquire\(.*?\)'
-        condition: and
-
-      # Identify excessive thread creation (can lead to resource exhaustion)
-      - type: regex
-        regex:
-          - 'new-instance\s+\S+,\s+Ljava/lang/Thread;'
+          - 'new-instance\s+v\d+,\s+Ljava/lang/Thread;'
+          - 'invoke-direct\s+\{v\d+,.*?\},\s+Ljava/lang/Thread;-><init>\(.*?\)V'
         condition: and

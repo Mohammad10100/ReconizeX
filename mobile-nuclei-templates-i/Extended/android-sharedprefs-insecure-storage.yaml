@@ -1,0 +1,22 @@
+id: android-sharedprefs-insecure-storage
+
+info:
+  name: Insecure Use of SharedPreferences for Sensitive Data
+  author: mohammad
+  severity: high
+  description: Detects any usage of SharedPreferences or its Editor in Android apps — often an insecure storage method when used without encryption.
+  tags: android, security, sharedpreferences, storage, cleartext
+
+file:
+  - extensions:
+      - smali
+      - java
+
+    matchers:
+      - type: regex
+        regex:
+          - 'Landroid/content/SharedPreferences;->getString\(Ljava/lang/String;Ljava/lang/String;\)'  # Reading
+          - 'Landroid/content/SharedPreferences\$Editor;->putString\(Ljava/lang/String;Ljava/lang/String;\)'  # Writing
+          - 'getSharedPreferences\(.*?\)'  # Accessing shared prefs
+          - 'PreferenceManager\.getDefaultSharedPreferences\(.*?\)'  # Common insecure default
+        condition: or

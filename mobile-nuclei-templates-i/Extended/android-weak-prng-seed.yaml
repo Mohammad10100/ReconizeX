@@ -3,7 +3,7 @@ id: android-weak-prng-seed
 info:
   name: Android Weak PRNG Seed Initialization
   author: mohammad
-  severity: high
+  severity: medium
   description: |
     Detects weak seed initialization for `SecureRandom`, which may lead to predictable random number generation.
     Using predictable seeds (e.g., time-based seeds) makes the PRNG outputs guessable.
@@ -25,8 +25,3 @@ file:
           - 'invoke-static\s+\{.*?\},\s+Ljava/lang/System;->currentTimeMillis\(\)J'  # Time-based seed
           - 'invoke-static\s+\{.*?\},\s+Ljava/lang/System;->nanoTime\(\)J'  # Time-based seed
           - 'invoke-static\s+\{.*?\},\s+Ljava/util/UUID;->randomUUID\(\)Ljava/util/UUID;'  # UUID-based seed
-
-      # Detect improper manual seed setting (hardcoded values)
-      - type: regex
-        regex:
-          - 'const-wide/16\s+\S+,\s*\d+'  # Hardcoded seed value

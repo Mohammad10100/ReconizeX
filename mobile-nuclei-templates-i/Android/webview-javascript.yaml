@@ -1,17 +1,16 @@
 id: webview-javascript-enabled
 
 info:
-  name: Webview JavaScript Enabled
+  name: WebView JavaScript Enabled
   author: mohammad
   severity: medium
   description: |
-    Detects if JavaScript is enabled in WebView through the `setJavaScriptEnabled` method. 
-    Enabling JavaScript in WebViews can expose the app to various security risks, including cross-site scripting (XSS) attacks or data leakage, particularly if untrusted content is loaded.
+    Detects usage of `setJavaScriptEnabled(true)` which can make WebView vulnerable to JS-based attacks if untrusted content is loaded.
   reference:
     - https://developer.android.com/reference/android/webkit/WebSettings#setJavaScriptEnabled(boolean)
   remediation: |
-    Avoid enabling JavaScript in WebViews unless absolutely necessary. If enabled, ensure that only trusted content is loaded, and apply proper security measures such as Content Security Policy (CSP) to mitigate risks.
-    Consider using more restrictive methods for rendering content, such as `WebView.loadData` with sanitization.
+    Enable JavaScript only if necessary, and restrict to trusted content.
+  tags: android, webview, javascript, xss, smali, java
 
 file:
   - extensions:
@@ -20,4 +19,6 @@ file:
     matchers:
       - type: regex
         regex:
-          - "Landroid/webkit/WebSettings;->setJavaScriptEnabled(Z)V"
+          - \.setJavaScriptEnabled\('  # Java
+          - 'Landroid/webkit/WebSettings;->setJavaScriptEnabled\\(Z\\)V'  # Smali ref
+          - 'invoke-virtual\\s+\\{[^}]+\\},\\s+Landroid/webkit/WebSettings;->setJavaScriptEnabled\\(Z\\)V'  # Smali call

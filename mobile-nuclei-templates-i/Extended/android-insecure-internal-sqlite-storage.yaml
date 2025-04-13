@@ -1,0 +1,24 @@
+id: android-insecure-internal-sqlite-storage
+
+info:
+  name: Insecure Internal SQLite Storage
+  author: mohammad
+  severity: high
+  description: Detects plaintext storage of sensitive data in internal SQLite using raw SQL.
+  tags: android, smali, sqlite, storage, data-leak, cwe-312
+
+file:
+  - extensions: [smali]
+    matchers-condition: and
+    matchers:
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{[^}]*\},\s+L[^;]+;->openOrCreateDatabase\(Ljava/lang/String;ILandroid/database/sqlite/SQLiteDatabase\$CursorFactory;\)Landroid/database/sqlite/SQLiteDatabase;'
+
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".*?CREATE\s+TABLE.*?(myuser|user|credentials|auth).*?"'
+
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{[^}]*\},\s+Landroid/database/sqlite/SQLiteDatabase;->execSQL\(Ljava/lang/String;\)V'

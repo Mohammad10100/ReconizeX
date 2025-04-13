@@ -1,0 +1,17 @@
+id: android-insecure-internal-file-storage
+info:
+  name: Insecure Internal File Storage (dataDir)
+  author: mohammad
+  severity: high
+  description: Detects insecure plaintext storage of sensitive data inside app’s internal directory (`/data/data/<package>/`) using Java File APIs.
+  tags: android, smali, file, storage, insecure-storage, data-leak, cwe-312
+
+file:
+  - extensions: [smali]
+    matchers:
+      - type: regex
+        regex:
+          - 'Landroid/content/pm/ApplicationInfo;->dataDir:Ljava/lang/String;'
+          - 'new-instance\s+\S+,\s+Ljava/io/FileWriter;'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/FileWriter;->write\(Ljava/lang/String;\)V'
+        condition: and

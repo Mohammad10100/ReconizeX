@@ -3,36 +3,25 @@ info:
   name: Android Smali Broadcast Receiver - Strict Improper Intent Verification
   author: mohammad
   severity: high
-  description: Detects Broadcast Receivers that retrieve intent data without proper validation, which may lead to security risks such as Intent Spoofing.
-  tags: android, security, smali, intent, receiver
+  description: Detects Smali broadcast receivers accessing intent data (e.g. action, extras) and using it in critical flows (e.g. startActivity/sendBroadcast) without proper validation.
+  tags: android, security, smali, intent, broadcast, spoofing
 
 file:
   - extensions:
       - smali
     matchers:
-      # Match intent data retrieval and usage in sensitive contexts (startActivity, sendBroadcast, etc.)
+      # Smali method header for broadcast receiver handler
       - type: regex
         regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->(getAction|getExtras|getData|getParcelableExtra)\(.*?\).*?'
+          - '\.method public onReceive\(Landroid/content/Context;Landroid/content/Intent;\)V'
+
+      # Extracting data from the Intent
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->(getAction|getStringExtra|getData|getParcelableExtra|getExtras)\(.*?\)'
+
+      # Critical action taken based on unvalidated input
+      - type: regex
+        regex:
+          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Context;->(startActivity|startService|sendBroadcast)\(.*?\)'
         condition: and
-
-      # Ensure no validation occurs after retrieving intent data (i.e., missing checks for equality or nullity)
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->equals\(Ljava/lang/Object;\)Z'  # Check for equals() validation
-          - 'if-eqz\s+.*?,\s+.*?'  # Check for null or equality checks
-          - 'if-nez\s+.*?,\s+.*?'
-        negative: true  # Ensure these patterns are NOT present
-
-      # Ensure the retrieved data is used in critical methods without proper validation
-      - type: regex
-        regex:
-          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Context;->(startActivity|sendBroadcast|startService)\(.*?\).*?'  # Sensitive methods like startActivity
-          - 'invoke-\w+\s+\{.*?\},\s+Landroid/content/Intent;->(setClass|setComponent|setPackage)\(.*?\).*?'  # Intent manipulation
-        condition: and
-
-      # Add a rule to catch suspicious use of intent data without validation
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Landroid/content/Intent;->getAction\(\).*?'
-        negative: true  # Ensure there's no direct action check without validation

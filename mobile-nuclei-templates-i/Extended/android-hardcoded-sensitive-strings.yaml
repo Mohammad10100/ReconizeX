@@ -1,0 +1,25 @@
+id: android-hardcoded-sensitive-strings
+
+info:
+  name: Android Hardcoded Sensitive Strings Detection
+  author: mohammad
+  severity: high
+  description: >
+    Detects hardcoded sensitive strings in Smali code, such as keys,
+    credentials, secrets, tokens, and passwords — based on keyword patterns.
+  tags: android, security, smali, secrets, hardcoded
+
+file:
+  - extensions:
+      - smali
+
+    matchers:
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*".*?(?i)(password|token|apikey|secret|auth|access[_-]?key|credentials|private[_-]?key|session[_-]?id).*?"'
+
+    extractors:
+      - type: regex
+        regex:
+          - 'const-string\s+v\d+,\s*"([^"]+)"'
+        internal: true

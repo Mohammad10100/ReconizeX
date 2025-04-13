@@ -1,41 +1,23 @@
 id: android-path-traversal
+
 info:
-  name: Android Path Traversal Vulnerability
+  name: Android Path Traversal Vulnerability - Strict
   author: mohammad
   severity: high
-  description: Detects improper limitation of a pathname to a restricted directory, which may lead to path traversal attacks.
-  tags: android, security, path-traversal, file-access, smali
+  description: Detects confirmed path traversal patterns with unsafe file access without validation.
+  tags: android, security, path-traversal, file-access, smali, cwe-22
 
 file:
   - extensions:
       - smali
+    matchers-condition: and  # <- top-level condition!
     matchers:
-      # Match hardcoded directory traversal patterns
       - type: regex
         regex:
-          - 'const-string\s+v\d+,\s*".*?/(\.\./)+.*?"'   # Standard ../ traversal
-          - 'const-string\s+v\d+,\s*".*?%2E%2E%2F.*?"'  # URL-encoded ../ (%2E%2E%2F)
-          - 'const-string\s+v\d+,\s*".*?%252E%252E%252F.*?"'  # Double-encoded traversal
+          - 'const-string\s+v\d+,\s*".*?(/\.\./|%2[Ee]%2[Ee]%2[Ff]|%25%32%45%25%32%45%25%32%46).*?"'
 
-      # Match insecure file path handling (getCanonicalPath can be bypassed)
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/File;->getCanonicalPath\(\)Ljava/lang/String;'
-
-      # Match direct file instantiation without validation
       - type: regex
         regex:
           - 'invoke-direct\s+\{.*?\},\s+Ljava/io/File;-><init>\(Ljava/lang/String;\)V'
-
-      # Detect file read/write operations with user-controlled paths
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/FileInputStream;-><init>\(Ljava/lang/String;\)V'  # Reading files
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/FileOutputStream;-><init>\(Ljava/lang/String;\)V'  # Writing files
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/io/File(InputStream|OutputStream);-><init>\(Ljava/lang/String;\)V'
         condition: or
-
-      # Exclude false positives (e.g., logging, cache, safe directories)
-      - type: regex
-        regex:
-          - 'const-string\s+v\d+,\s*".*?(log|cache|temp|safe).*?"'
-        negative: true  # Exclude safe file operations

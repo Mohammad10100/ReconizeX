@@ -3,16 +3,14 @@ id: webview-addjavascript-interface
 info:
   name: Webview addJavascript Interface Usage
   author: mohammad
-  severity: medium
+  severity: high
   description: |
-    Detects the usage of WebView's `addJavascriptInterface` method, which can introduce security vulnerabilities.
-    This method allows JavaScript to access Android object methods, which could be exploited for malicious purposes, such as unauthorized access to sensitive data or features.
+    Detects use of `addJavascriptInterface()` which can expose native methods to JavaScript, leading to RCE if misused.
   reference:
     - https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)
   remediation: |
-    Avoid using `addJavascriptInterface` with untrusted JavaScript content.
-    If necessary, restrict the interface to only trusted sources and limit the exposed methods to reduce the attack surface.
-    Consider using other mechanisms such as WebView's `postMessage` for more secure communication.
+    Avoid this unless absolutely needed, and never expose sensitive methods. Allow only from trusted sources.
+  tags: android, webview, javascript, rce, smali, java
 
 file:
   - extensions:
@@ -21,4 +19,6 @@ file:
     matchers:
       - type: regex
         regex:
-          - ";->addJavascriptInterface(Ljava/lang/Object;Ljava/lang/String;)V"
+          - '\.addJavascriptInterface\('  # Java usage
+          - 'Landroid/webkit/WebView;->addJavascriptInterface\\(Ljava/lang/Object;Ljava/lang/String;\\)V'  # Smali method ref
+          - 'invoke-virtual\\s+\\{[^}]+\\},\\s+Landroid/webkit/WebView;->addJavascriptInterface\\(Ljava/lang/Object;Ljava/lang/String;\\)V'  # Smali call

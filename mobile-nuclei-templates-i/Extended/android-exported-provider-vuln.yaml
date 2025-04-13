@@ -1,0 +1,22 @@
+id: android-exported-provider-vuln
+
+info:
+  name: Exported ContentProvider Detection
+  author: mohammad
+  severity: high
+  description: Detects exported ContentProviders that may be vulnerable to unauthorized data access.
+  tags: android, manifest, provider, exported
+
+file:
+  - extensions:
+      - xml
+    matchers:
+      - type: regex
+        regex:
+          - '<provider[^>]*android:exported="true"[^>]*>'
+        condition: or
+    extractors:
+      - type: regex
+        regex:
+          - 'android:name="([^"]+)"'
+          - 'android:authorities="([^"]+)"'

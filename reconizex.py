@@ -64,8 +64,31 @@ def restricted_scan(decompile_dir, package_name):
     # Dynamically find all smali* directories
     smali_base_dirs = [d for d in os.listdir(decompile_dir) if d.startswith("smali")]
     smali_target_dirs = [os.path.join(decompile_dir, d, *smali_dirs) for d in smali_base_dirs]
+
+    # existing_dirs = [d for d in smali_target_dirs if os.path.exists(d)]
+    manifest_path = os.path.join(decompile_dir, "AndroidManifest.xml")
+    apktoolyml_path = os.path.join(decompile_dir, "apktool.yml")
+
+    # Copy AndroidManifest.xml into each valid smali directory
+    for smali_dir in smali_target_dirs:
+        if os.path.exists(smali_dir) and os.path.isfile(manifest_path):
+            try:
+                shutil.copy(manifest_path, smali_dir)
+                print_status(f"Copied AndroidManifest.xml to {smali_dir}", "+")
+            except Exception as e:
+                print_status(f"Failed to copy manifest to {smali_dir}: {e}", "-")
+        
+        if os.path.exists(smali_dir) and os.path.isfile(apktoolyml_path):
+            try:
+                shutil.copy(apktoolyml_path, smali_dir)
+                print_status(f"Copied apktool.yml to {smali_dir}", "+")
+            except Exception as e:
+                print_status(f"Failed to copy apktool.yml to {smali_dir}: {e}", "-")
+                
     
     existing_dirs = [d for d in smali_target_dirs if os.path.exists(d)]
+
+    print(existing_dirs, "Existing +++")
     if not existing_dirs:
         print_status("No smali directories found for the specified package.", "-")
         sys.exit(1)

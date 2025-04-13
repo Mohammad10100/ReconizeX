@@ -1,33 +1,26 @@
 id: android-clipboard-data-leak
+
 info:
   name: Android Clipboard Data Leak Detection
   author: mohammad
   severity: high
-  description: Detects potential clipboard data leakage in Android applications, which may allow sensitive data to be accessed by other apps or attackers.
+  description: >
+    Detects unvalidated or unsafe access to clipboard content in Android apps.
+    Focuses purely on clipboard reading — analysis of how it's used should be handled separately.
   tags: android, security, clipboard, data-leak
 
 file:
   - extensions:
       - smali
       - java
+
     matchers:
-      # Detects direct access to the clipboard
+      # Only match clipboard access (reading from clipboard)
       - type: regex
         regex:
-          - 'Landroid/content/ClipboardManager;->getPrimaryClip\(\)' # Access clipboard content
-          - 'Landroid/content/ClipboardManager;->setPrimaryClip\(\)' # Setting clipboard content
-      # Detects cases where clipboard data is used without proper checks or validation
+          - 'Landroid/content/ClipboardManager;->(getPrimaryClip|getText)\(\)'
+
+    extractors:
       - type: regex
         regex:
-          - 'getText\(\)' # Get clipboard text without proper validation
-          - 'setText\(\)' # Set text to clipboard without proper validation
-      # Detects storing clipboard data in logs or other insecure locations
-      - type: regex
-        regex:
-          - 'Log\.d\(\s*"TAG",\s*"[^"]*clip[^"]*"\)' # Storing clipboard data in logs
-          - 'Log\.e\(\s*"TAG",\s*"[^"]*clip[^"]*"\)' # Error logging of clipboard data
-      # Detects clipboard content being shared across activities or between apps
-      - type: regex
-        regex:
-          - 'startActivity\(\s*new Intent\(.*?\)\s*\)' # Starting activity potentially sharing clipboard content
-        condition: or
+          - 'const-string\s+v\d+,\s*"([^"]*clip[^"]*)"'  # helpful tag extraction

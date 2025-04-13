@@ -3,30 +3,22 @@ info:
   name: Android Smali Log Injection (Improper Output Neutralization)
   author: mohammad
   severity: medium
-  description: Detects improper logging of sensitive data or untrusted input in Smali code.
+  description: Detects potential logging of untrusted or sensitive data in Smali code, particularly when log content is built dynamically without sanitization.
   tags: android, security, smali, log-injection
 
 file:
   - extensions:
       - smali
+    mathers-condition: and
     matchers:
-      # Detect logging function calls in Log class (only when involving user input or sensitive data)
+      # Dynamic log content construction (e.g., user input or string operations)
+      - type: regex
+        regex:
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->(toString|format|concat|replace|replaceAll|substring)\(.*?\)'
+          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'
+        condition: or
+
+      # Log method call (requires it to actually be logged)
       - type: regex
         regex:
           - 'invoke-static\s+\{.*?\},\s+Landroid/util/Log;->[deiwv]\(Ljava/lang/String;Ljava/lang/String;\)I'
-        condition: and
-
-      # Detect logs that contain sensitive data (ensuring they are actually being logged)
-      - type: regex
-        regex:
-          - 'const-string\s+\S+,\s*".*?(password|api_key|token|secret|auth|access_key|session_id|jwt|private_key).*?"'
-        condition: and
-
-      # Detect cases where user-controlled input is formatted or manipulated before being logged
-      - type: regex
-        regex:
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->format\(Ljava/lang/String;.*?\)'
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/String;->concat\(Ljava/lang/String;\)'
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuilder;->append\(Ljava/lang/String;\)'
-          - 'invoke-virtual\s+\{.*?\},\s+Ljava/lang/StringBuffer;->append\(Ljava/lang/String;\)'
-        condition: and
